@@ -1,53 +1,108 @@
-var dataArray = {
-    x: [-8, -6, -4, -2, 0, 2, 4, 6, 8],
-    y: [99, 610, 1271, 1804, 1823, 1346, 635, 125, 24]
-};
-
+//setting up empty data array
 var data = [];
-for (var i = 0; i < dataArray.x.length; i++) {
-    data[i] = { x: dataArray.x[i], y: dataArray.y[i] };
-}
-console.log(data);
+var sample = [];
 
-var width = 600,
-    height = 500,
-    spacing = 120;
+getData(); // popuate data 
 
-var svg = d3.select("body")
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .append("g")
-            .attr("transform", "translate(" + spacing/2 + "," + spacing/2 + ")");
+// line chart based on http://bl.ocks.org/mbostock/3883245
+var margin = {
+        top: 20,
+        right: 20,
+        bottom: 30,
+        left: 50
+    },
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-var xScale = d3.scaleLinear()
-                .domain([d3.min(dataArray.x) - 1, d3.max(dataArray.x) + 1])
-                .range([0, width - spacing]);
+var x = d3.scaleLinear()
+    .range([0, width]);
 
-var yScale = d3.scaleLinear()
-                .domain([0, d3.max(dataArray.y)])
-                .range([height - spacing, 0]);
+var y = d3.scaleLinear()
+    .range([height, 0]);
 
-var xAxis = d3.axisBottom(xScale);
-var yAxis = d3.axisLeft(yScale);
+var xAxis = d3.axisBottom()
+    .scale(x);
+
+var yAxis = d3.axisLeft()
+    .scale(y);
+
+var line = d3.line()
+    .x(function(d) {
+        return x(d.q);
+    })
+    .y(function(d) {
+        return y(d.p);
+    });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+x.domain(d3.extent(data, function(d) {
+    return d.q;
+}));
+y.domain(d3.extent(data, function(d) {
+    return d.p;
+}));
 
 svg.append("g")
-    .attr("transform", "translate(0," + (height - spacing) + ")")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
     .call(xAxis);
 
-svg.append("g").call(yAxis);
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
 
-var dots = svg.append("g")
-                .selectAll("dot")
-                .data(data);
+svg.append("path")
+    .datum(data)
+    .attr("class", "line")
+    .attr("d", line);
 
-dots.enter()
-    .append("circle")
-    .attr("cx", function (d) { 
-        return xScale(d.x); 
-    })
-    .attr("cy", function (d) {
-        return yScale(d.y); 
-    })
-    .attr("r", 5)
-    .style("fill", "red");
+function getData() {
+    // loop to populate data array with 
+    // probabily - quantile pairs
+    for (var i = 0; i < 100000; i++) {
+        q = normal() // calc random draw from normal dist
+        p = gaussian(q) // calc prob of rand draw
+        el = {
+            "q": q,
+            "p": p
+        }
+        data.push(el)
+    };
+
+    // need to sort for plotting
+    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+    data.sort(function(x, y) {
+        return x.q - y.q;
+    });	
+}
+
+// from http://bl.ocks.org/mbostock/4349187
+// Sample from a normal distribution with mean 0, stddev 1.
+function normal() {
+    var x = 0,
+        y = 0,
+        rds, c;
+    do {
+        x = Math.random() * 2 - 1;
+        y = Math.random() * 2 - 1;
+        rds = x * x + y * y;
+    } while (rds == 0 || rds > 1);
+    c = Math.sqrt(-2 * Math.log(rds) / rds); // Box-Muller transform
+    return x * c; // throw away extra sample y * c
+}
+
+//taken from Jason Davies science library
+// https://github.com/jasondavies/science.js/
+function gaussian(x) {
+	var gaussianConstant = 1 / Math.sqrt(2 * Math.PI),
+		mean = 0,
+    	sigma = 1;
+
+    x = (x - mean) / sigma;
+    return gaussianConstant * Math.exp(-.5 * x * x) / sigma;
+};
