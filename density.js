@@ -94,13 +94,12 @@ function sampleDistributionGraph($elem, data) {
 
 		var points = [];
 		for (var p = Math.pow(dataRange[0], base),len=Math.pow(dataRange[1], base); p<len; p+=expQ)
-			points.push(d3.round(Math.pow(p,1/base), 2));
+			points.push(Math.round(Math.pow(p,1/base), 2));
 
-		points.push(d3.round(dataRange[1], 2));
+		points.push(Math.round(dataRange[1], 2));
 
-		var histogram = d3.layout.histogram()
-			.frequency(false)
-			.bins(points);
+		var histogram = d3.histogram()
+			.thresholds(points);
 
 		return histogram(data);
 	}
@@ -126,7 +125,7 @@ function sampleDistributionGraph($elem, data) {
 	function getXScale(xVals, logScaleBase) {
 		var maxX = d3.max(xVals);
 
-		return (logScaleBase==1?d3.scale.linear():d3.scale.pow().exponent(1/logScaleBase))
+		return (logScaleBase==1?d3.scaleLinear():d3.scalePow().exponent(1/logScaleBase))
 			.domain([0, maxX])
 			.range([0, GRAPH_W])
 			.clamp(true);
@@ -147,14 +146,14 @@ function sampleDistributionGraph($elem, data) {
 
 		maxY=(maxY==0?1:maxY);
 
-		return d3.scale.linear()
+		return d3.scaleLinear()
 			.domain([0, maxY*1.05])
 			.range([GRAPH_H, 0])
 			.clamp(true);
 	}
 
 	function getY2Scale() {
-		return d3.scale.linear()
+		return d3.scaleLinear()
 			.domain([0, 1])
 			.range([GRAPH_H, 0]);
 	}
@@ -200,7 +199,7 @@ function sampleDistributionGraph($elem, data) {
 
 		grid.append("g").attr("class", "y-grid");
 
-		grid.style({
+		grid.styles({
 			"shape-rendering": "crispEdges",
 			"fill": "none",
 			"stroke": "lightgrey",
@@ -213,7 +212,7 @@ function sampleDistributionGraph($elem, data) {
 			.attr("height", SAMPLE_AREA_H)
 			.attr("x", 0)
 			.attr("y", GRAPH_H)
-			.style({
+			.styles({
 				"stroke": 'black',
 				"stroke-width": 0.5,
 				"stroke-opacity": 0.7,
@@ -236,33 +235,32 @@ function sampleDistributionGraph($elem, data) {
 			.attr("class", "y2-axis")
 			.attr("transform", "translate(" + GRAPH_W + ", 0)")
 			.call(
-				d3.svg.axis()
+				d3.axisRight()
 					.scale(y2Scale)
-					.orient("right")
-					.tickFormat( function(d) { return d3.round(d*100,2) + "%" } )
+					.tickFormat( function(d) { return Math.round(d*100,2) + "%" } )
 			)
-			.style('opacity', (showCdf?1:0));
+			.styles('opacity', (showCdf?1:0));
 
-		axises.style({
+		axises.styles({
 			"shape-rendering": "crispEdges",
 			"font": AXIS_MARGIN*.25 + 'px sans-serif'
 		});
 
 		axises.selectAll('path, line')
-			.style({
+			.styles({
 				"stroke": "black",
 				"fill": "none"
 		});
 
 		/* Labels */
 		container.append("text")
-			.attr("x", GRAPH_W)
+			.attr("x", GRAPH_W - AXIS_MARGIN*2)
 			.attr("y", GRAPH_H + SAMPLE_AREA_H)
-			.style("text-anchor", "end")
+			.styles("text-anchor", "end")
 			.attr('dy','2.5em')
-			.style({
-				"font": "italic "+ AXIS_MARGIN*.28 + 'px sans-serif',
-				"fill": '#777'
+			.styles({
+				font: 'italic '+ AXIS_MARGIN*.28 + 'px sans-serif',
+				fill: '#777'
 			})
 			.text(data.length + " Samples");
 
@@ -270,23 +268,23 @@ function sampleDistributionGraph($elem, data) {
 			.attr("transform", "rotate(-90)")
 			.attr("y", 8)
 			.attr('dy','.8em')
-			.style("text-anchor", "end")
+			.styles("text-anchor", "end")
 			.text("Relative (%)");
 
 		y2Axis.append("text")
 			.attr("transform", "rotate(-90)")
 			.attr("y", -12)
-			.style("text-anchor", "end")
+			.styles("text-anchor", "end")
 			.text("Cumulative (%)");
 
 		y2Axis.selectAll('text')
-			.style("fill", "green");
+			.styles("fill", "green");
 
 		/*
 		// Tooltip
 		container.append("div")
 			.attr("class", "graphTooltip")
-			.style({
+			.styles({
 				position: 'absolute',
 				'text-align': 'left',
 				width: '100px',
@@ -307,44 +305,42 @@ function sampleDistributionGraph($elem, data) {
 			.attr('y', 0)
 			.attr('width', GRAPH_W)
 			.attr('height', GRAPH_H)
-			.style({
+			.styles({
 				opacity: 0,
 				cursor: 'crosshair'
 			});
 
-		svg.on("mousedown", function() {
-				var e = this;
-
-				if (d3.mouse(e)[0]<0 || d3.mouse(e)[0]>GRAPH_W || d3.mouse(e)[1]<0 || d3.mouse(e)[1]>GRAPH_H)
+		svg.on("mousedown", function(e) {
+				if (d3.pointer(e)[0]<0 || d3.pointer(e)[0]>GRAPH_W || d3.pointer(e)[1]<0 || d3.pointer(e)[1]>GRAPH_H)
 					return;
 
 				var rect = svg.append("rect")
-					.style({
+					.styles({
 						stroke: 'blue',
 						'stroke-opacity': .6,
 						fill: 'blue',
 						'fill-opacity': .3
 					});
 
-				var startX = d3.mouse(e)[0];
+				var startX = d3.pointer(e)[0];
 
 				d3.select("body").classed("stat-noselect", true);
 
 				d3.select(window)
-					.on("mousemove.zoomRect", function() {
-						d3.event.stopPropagation();
-						var newX = Math.max(0, Math.min(GRAPH_W, d3.mouse(e)[0]));
+					.on("mousemove.zoomRect", function(e) {
+						e.stopPropagation();
+						var newX = Math.max(0, Math.min(GRAPH_W, d3.pointer(e)[0]));
 						rect.attr("x", Math.min(startX, newX))
 							.attr("y", 0)
 							.attr("width", Math.abs(startX - newX))
 							.attr("height", GRAPH_H);
 						})
-					.on("mouseup.zoomRect", function() {
+					.on("mouseup.zoomRect", function(e) {
 						d3.select(window).on("mousemove.zoomRect", null).on("mouseup.zoomRect", null);
 						d3.select("body").classed("stat-noselect", false);
 						rect.remove();
 
-						var endX = Math.max(0, Math.min(GRAPH_W, d3.mouse(e)[0]));
+						var endX = Math.max(0, Math.min(GRAPH_W, d3.pointer(e)[0]));
 						var newDomain = [startX, endX].map(xScale.invert).sort(d3.ascending);
 						if ((endX !== startX) && (newDomain[1]-newDomain[0]>0.001)) {  // Zoom damper
 							xScale.domain(newDomain);
@@ -352,15 +348,15 @@ function sampleDistributionGraph($elem, data) {
 						}
 					}, true);
 
-				d3.event.stopPropagation();
+				e.stopPropagation();
 			})
 			.append('title').text('click-drag to zoom in');
 
 		container.append('text')
-			.attr("x", GRAPH_W*.99)
+			.attr("x", GRAPH_W*.99 - AXIS_MARGIN*2)
 			.attr("y", -GRAPH_H*.03)
-			.style("text-anchor", "end")
-			.style({
+			.styles("text-anchor", "end")
+			.styles({
 				font: "italic " + AXIS_MARGIN*.26 + 'px sans-serif',
 				fill: "blue",
 				opacity: .65,
@@ -372,10 +368,10 @@ function sampleDistributionGraph($elem, data) {
 				redrawX();
 			})
 			.on("mouseover", function(){
-				d3.select(this).style('opacity', 1);
+				d3.select(this).styles('opacity', 1);
 			})
 			.on("mouseout", function() {
-				d3.select(this).style('opacity', .6);
+				d3.select(this).styles('opacity', .6);
 			});
 
 		renderContainer(svg, xScale, yScale, y2Scale);
@@ -384,27 +380,23 @@ function sampleDistributionGraph($elem, data) {
 
 	function renderContainer(svg, xScale, yScale) {
 
-		var xAxis = d3.svg.axis()
-			.scale(xScale)
-			.orient("bottom");
+		var xAxis = d3.axisBottom()
+			.scale(xScale);
 			//.ticks(10, 2);
 
-		var xGrid = d3.svg.axis()
+		var xGrid = d3.axisTop()
 			.scale(xScale)
-			.orient("top")
 			.tickFormat("")
 			.tickSize(GRAPH_H + SAMPLE_AREA_H, 0, 0);
 			//.ticks(10, 1);
 
-		var yAxis = d3.svg.axis()
+		var yAxis = d3.axisLeft()
 			.scale(yScale)
-			.orient("left")
-			.tickFormat( function(d) { return d3.round(d*100,3) + "%" } );
+			.tickFormat( function(d) { return Math.round(d*100,3) + "%" } );
 			//.ticks(10, 2);
 
-		var yGrid = d3.svg.axis()
+		var yGrid = d3.axisRight()
 			.scale(yScale)
-			.orient("right")
 			.tickFormat("")
 			.tickSize(GRAPH_W, 0, 0);
 			//.ticks(10, 1);
@@ -428,13 +420,13 @@ function sampleDistributionGraph($elem, data) {
 		var axises = svg.select('.axises');
 
 		axises.selectAll('path, line')
-			.style({
+			.styles({
 				"stroke": "black",
 				"fill": "none"
 			});
 
 		axises.select('.y-axis').selectAll('text')
-			.style("fill", "brown");
+			.styles("fill", "brown");
 	}
 
 	function renderSampleArea(svg, data, xScale) {
@@ -461,7 +453,7 @@ function sampleDistributionGraph($elem, data) {
 
 		samples.exit()
 			.transition()
-				.style({
+				.styles({
 					"fill-opacity": 0,
 					"stroke-opacity": 0
 				})
@@ -472,7 +464,7 @@ function sampleDistributionGraph($elem, data) {
 		samples.transition().duration(TRANSITION_DUR)
 			.attr("x1", function(d) { return xScale(d); })
 			.attr("x2", function(d) { return xScale(d); })
-			.style("stroke-opacity", function (d, i) { return (i<feedData.length-2 || (d!=mean && d!=median))?sampleOpacity:0.9; });
+			.styles("stroke-opacity", function (d, i) { return (i<feedData.length-2 || (d!=mean && d!=median))?sampleOpacity:0.9; });
 
 		var newSamples = samples.enter().append("line")
 			.attr("class", "bw-sample")
@@ -480,7 +472,7 @@ function sampleDistributionGraph($elem, data) {
 			.attr("y2", GRAPH_H + SAMPLE_AREA_H)
 			.attr("x1", function(d) { return xScale(d); })
 			.attr("x2", function(d) { return xScale(d); })
-			.style({
+			.styles({
 				"stroke": "blue",
 				"stroke-width": 1,
 				"stroke-opacity": 0,
@@ -488,15 +480,15 @@ function sampleDistributionGraph($elem, data) {
 			});
 
 		newSamples.transition().duration(TRANSITION_DUR/2)
-			.style("stroke-opacity", function (d,i) { return (i<feedData.length-2 || (d!=mean && d!=median))?sampleOpacity:0.9; });
+			.styles("stroke-opacity", function (d,i) { return (i<feedData.length-2 || (d!=mean && d!=median))?sampleOpacity:0.9; });
 
 		newSamples.filter(function(d,i) { return (i>=feedData.length-2 && (d==mean || d==median)); })
-			.style({
+			.styles({
 				stroke: function (d) { return d==mean?'brown':'darkorange'; },
 				'stroke-width': 2,
 				cursor: 'help'
 			})
-			.append('title').text(function(d) { return (d==mean?('Average Value: ' + d3.round(d,3)):('Median Value: ' + d3.round(d,3))) });
+			.append('title').text(function(d) { return (d==mean?('Average Value: ' + Math.round(d,3)):('Median Value: ' + Math.round(d,3))) });
 	}
 
 	function renderHistogram(svg, data, xScale, yScale) {
@@ -510,7 +502,7 @@ function sampleDistributionGraph($elem, data) {
 
 		bars.exit()
 			.transition()
-				.style({
+				.styles({
 					"fill-opacity": 0,
 					"stroke-opacity": 0
 				})
@@ -529,7 +521,7 @@ function sampleDistributionGraph($elem, data) {
 		newBars
 			.attr("rx", 1)
 			.attr("ry", 1)
-			.style({
+			.styles({
 				"fill": "lightgrey",
 				"fill-opacity": .3,
 				"stroke": "brown",
@@ -538,7 +530,9 @@ function sampleDistributionGraph($elem, data) {
 				"cursor": "crosshair"
 			})
 			.attr("x", function(d) { return xScale(d.x); })
-			.attr("width", function(d) { return xScale(d.x + d.dx) - xScale(d.x); })
+			.attr("width", function(d) {
+				return xScale(d.x + d.dx) - xScale(d.x); 
+			})
 			.attr("y", GRAPH_H)
 			.attr("height", 0)
 			.transition().duration(TRANSITION_DUR)
@@ -550,7 +544,7 @@ function sampleDistributionGraph($elem, data) {
 			.on("mouseover", function() {
 				d3.select(this)
 					//.transition().duration(70)
-					.style({
+					.styles({
 						"stroke-opacity": .9,
 						"fill-opacity": .7
 					});
@@ -558,7 +552,7 @@ function sampleDistributionGraph($elem, data) {
 			.on("mouseout", function() {
 				d3.select(this)
 					//.transition().duration(250)
-					.style({
+					.styles({
 						"stroke-opacity": .4,
 						"fill-opacity": .3
 					});
@@ -568,7 +562,7 @@ function sampleDistributionGraph($elem, data) {
 
 		bars.select('title')
 			.text(function(d) {
-				return d.x + '-' + (d.x+d.dx) + " bin: " + d3.round(d.y*100,2) + "% (" + d.length + " samples)";
+				return d.x + '-' + (d.x+d.dx) + " bin: " + Math.round(d.y*100,2) + "% (" + d.length + " samples)";
 			});
 	}
 
@@ -584,10 +578,10 @@ function sampleDistributionGraph($elem, data) {
 		thisData.splice(0,0,[xScale.domain()[0],0]);
 		thisData.push([xScale.domain()[1],0]);
 
-		var line = d3.svg.line()
+		var line = d3.line()
 			.x(function(d) { return xScale(d[0]); })
 			.y(function(d) { return yScale(d[1]); })
-			.interpolate("basis");
+			.curve(d3.curveBasis);
 
 		var lines = svg.selectAll('.density-line')
 			.data([thisData]);
@@ -595,7 +589,7 @@ function sampleDistributionGraph($elem, data) {
 		lines.enter()
 			.append("path")
 			.attr("class", "density-line")
-			.style({
+			.styles({
 				"fill": "blue",
 				"fill-opacity": .13,
 				"stroke": "none"
@@ -614,10 +608,10 @@ function sampleDistributionGraph($elem, data) {
 		};
 
 		// CDF line
-		var line = d3.svg.line()
+		var line = d3.line()
 			.x(function(d) { return xScale(d[0]); })
 			.y(function(d) { return yScale(d[1]); })
-			.interpolate("basis");
+			.curve(d3.curveBasis);
 
 		var lines = svg.selectAll('.cdf-line')
 			.data([(showCdf?data:[])]);
@@ -625,23 +619,23 @@ function sampleDistributionGraph($elem, data) {
 		lines.enter()
 			.append("path")
 			.attr("class", "cdf-line")
-			.style({
+			.styles({
 				"fill": "none",
 				"stroke": "green",
 				"stroke-opacity": .4,
 				"stroke-width": "2px"
 			})
 			.on("mouseover", function() {
-				var coords= d3.mouse(this);
+				var coords= d3.pointer(this);
 				var x = xScale.invert(coords[0]);
 				var y = yScale.invert(coords[1]);
 
 				d3.select(this).select('title')
-					.text('<' + d3.round(x,2) + ': ' + d3.round(y*100, 2) + '%');
+					.text('<' + Math.round(x,2) + ': ' + Math.round(y*100, 2) + '%');
 
 				d3.select(this)
 					.transition()
-					.style({
+					.styles({
 						"stroke-width": "3px",
 						"stroke-opacity": .9
 					})
@@ -649,7 +643,7 @@ function sampleDistributionGraph($elem, data) {
 			.on("mouseout", function() {
 				svg.select('.cdf-line')
 					.transition()
-					.style({
+					.styles({
 						"stroke-width": "2px",
 						"stroke-opacity": .4
 					})
@@ -767,7 +761,7 @@ function sampleDistributionGraph($elem, data) {
 			renderCdf(svg, cdfData, xScale, y2Scale);
 			svg.select('.y2-axis')
 				.transition().duration(TRANSITION_DUR)
-				.style('opacity', (showCdf?1:0));
+				.styles('opacity', (showCdf?1:0));
 		});
 
 		densCb.change( function() {
