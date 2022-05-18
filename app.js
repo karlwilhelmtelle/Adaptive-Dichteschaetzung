@@ -61,6 +61,8 @@ svg.append("path")
     .attr("class", "line")
     .attr("d", line);
 
+sampleDistributionGraph($('body'), values);
+
 function getData() {
     // loop to populate data array with 
     // probabily - quantile pairs
