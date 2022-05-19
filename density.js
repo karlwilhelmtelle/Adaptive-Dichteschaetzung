@@ -494,7 +494,7 @@ function sampleDistributionGraph($elem, data) {
 	function renderHistogram(svg, data, xScale, yScale) {
 
 		var dataFilter = function(d) {
-			return (d.x >= xScale.domain()[0] && (d.x+d.dx)<=xScale.domain()[1]);
+			return (d.x0 >= xScale.domain()[0] && (d.x0+d.x1)<=xScale.domain()[1]);
 		};
 
 		var bars = svg.selectAll(".histo-bar")
@@ -509,10 +509,12 @@ function sampleDistributionGraph($elem, data) {
 				.remove();
 
 	   bars.transition().duration(TRANSITION_DUR)
-		  .attr("x", function(d) { return xScale(d.x); })
-		  .attr("y", function(d) { return yScale(d.y); })
-		  .attr("width", function(d) { return xScale(d.x + d.dx) - xScale(d.x); })
-		  .attr("height", function(d) { return GRAPH_H - yScale(d.y); });
+		  .attr("x", function(d) { return xScale(d.x0); })
+		  .attr("y", function(d, i) { return yScale(d[i]); })
+		  .attr("width", function(d) { return xScale(d.x0 + d.x1) - xScale(d.x0); })
+		  .attr("height", function(d, i) { 
+			  return GRAPH_H - yScale(d[i]); 
+			});
 
 		var newBars = bars.enter()
 		  .append("rect")
@@ -529,15 +531,15 @@ function sampleDistributionGraph($elem, data) {
 				"shape-rendering": "crispEdges",
 				"cursor": "crosshair"
 			})
-			.attr("x", function(d) { return xScale(d.x); })
+			.attr("x", function(d) { return xScale(d.x0); })
 			.attr("width", function(d) {
-				return xScale(d.x + d.dx) - xScale(d.x); 
+				return xScale(d.x0 + d.x1) - xScale(d.x0); 
 			})
 			.attr("y", GRAPH_H)
 			.attr("height", 0)
 			.transition().duration(TRANSITION_DUR)
-				.attr("y", function(d) { return yScale(d.y); })
-				.attr("height", function(d) { return GRAPH_H - yScale(d.y); });
+				.attr("y", function(d, i) { return yScale(d[i]); })
+				.attr("height", function(d, i) { return GRAPH_H - yScale(d[i]); });
 
 
 		newBars
@@ -561,8 +563,8 @@ function sampleDistributionGraph($elem, data) {
 		newBars.append('title');
 
 		bars.select('title')
-			.text(function(d) {
-				return d.x + '-' + (d.x+d.dx) + " bin: " + Math.round(d.y*100,2) + "% (" + d.length + " samples)";
+			.text(function(d, i) {
+				return d.x0 + '-' + (d.x0+d.x1) + " bin: " + Math.round(d[i]*100,2) + "% (" + d.length + " samples)";
 			});
 	}
 
@@ -625,8 +627,8 @@ function sampleDistributionGraph($elem, data) {
 				"stroke-opacity": .4,
 				"stroke-width": "2px"
 			})
-			.on("mouseover", function() {
-				var coords= d3.pointer(this);
+			.on("mouseover", function(event) {
+				var coords= d3.pointer(event);
 				var x = xScale.invert(coords[0]);
 				var y = yScale.invert(coords[1]);
 
