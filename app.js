@@ -1,6 +1,5 @@
 //setting up empty data array
 var data = [];
-var sample = [];
 
 getData(); // popuate data 
 
@@ -14,19 +13,21 @@ var margin = {
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-var x = d3.scaleLinear()
+var x = d3.scale.linear()
     .range([0, width]);
 
-var y = d3.scaleLinear()
+var y = d3.scale.linear()
     .range([height, 0]);
 
-var xAxis = d3.axisBottom()
-    .scale(x);
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
 
-var yAxis = d3.axisLeft()
-    .scale(y);
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
 
-var line = d3.line()
+var line = d3.svg.line()
     .x(function(d) {
         return x(d.q);
     })
