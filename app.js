@@ -65,8 +65,8 @@ svg.append("path")
 function getData() {
     // loop to populate data array with 
     // probabily - quantile pairs
-    for (var i = 0; i < 100000; i++) {
-        q = normal() // calc random draw from normal dist
+    for (var i = -4; i <= 4; i += 0.01) {
+        q = i;
         p = gaussian(q) // calc prob of rand draw
         el = {
             "q": q,
