@@ -1,8 +1,11 @@
 function mainCurve() {
     var HISTOGRAMQ = 1; // Default Q
+    var LOGSCALEBASE = 2;
+    var TRANSITION_DUR = 750; // ms
 
     //setting up empty data array
     var data = [];
+    var yData = [];
 
     getData(); // popuate data 
 
@@ -82,7 +85,11 @@ function mainCurve() {
         //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
         data.sort(function(x, y) {
             return x.q - y.q;
-        });	
+        });
+
+        yData = data.map(function (el) {
+            return el.p;
+        });
     }
 
     // from http://bl.ocks.org/mbostock/4349187
@@ -111,11 +118,81 @@ function mainCurve() {
         return gaussianConstant * Math.exp(-.5 * x * x) / sigma;
     }
 
-    function redraw() {
-        histogramData = getHistogram(data, histQ, logScaleBase);
-        yScale = getYScale(histogramData, xScale.domain());
+    function renderHistogram(svg, data, xScale, yScale) {
+		var dataFilter = function(d) {
+			return (d.x >= xScale.domain()[0] && (d.x+d.dx)<=xScale.domain()[1]);
+		};
 
-        
+		var bars = svg.selectAll(".histo-bar")
+			.data(data);
+
+		bars.exit()
+			.transition()
+				.style({
+					"fill-opacity": 0,
+					"stroke-opacity": 0
+				})
+				.remove();
+
+	   bars.transition().duration(TRANSITION_DUR)
+		  .attr("x", function(d) { return xScale(d.x); })
+		  .attr("y", function(d) { return yScale(d.y); })
+		  .attr("width", function(d) { return xScale(d.x + d.dx) - xScale(d.x); })
+		  .attr("height", function(d) { return GRAPH_H - yScale(d.y); });
+
+		var newBars = bars.enter()
+		  .append("rect")
+		  .attr("class", "histo-bar");
+
+		newBars
+			.attr("rx", 1)
+			.attr("ry", 1)
+			.style({
+				"fill": "lightgrey",
+				"fill-opacity": .3,
+				"stroke": "brown",
+				"stroke-opacity": .4,
+				"shape-rendering": "crispEdges",
+				"cursor": "crosshair"
+			})
+			.attr("x", function(d) { return xScale(d.x); })
+			.attr("width", function(d) { return xScale(d.x + d.dx) - xScale(d.x); })
+			.attr("y", height)
+			.attr("height", 0)
+			.transition().duration(TRANSITION_DUR)
+				.attr("y", function(d) { return yScale(d.y); })
+				.attr("height", function(d) { return height - yScale(d.y); });
+
+
+		newBars
+			.on("mouseover", function() {
+				d3.select(this)
+					//.transition().duration(70)
+					.style({
+						"stroke-opacity": .9,
+						"fill-opacity": .7
+					});
+			})
+			.on("mouseout", function() {
+				d3.select(this)
+					//.transition().duration(250)
+					.style({
+						"stroke-opacity": .4,
+						"fill-opacity": .3
+					});
+			});
+
+		newBars.append('title');
+
+		bars.select('title')
+			.text(function(d) {
+				return d.x + '-' + (d.x+d.dx) + " bin: " + d3.round(d.y*100,2) + "% (" + d.length + " samples)";
+			});
+	}
+
+    function redraw() {
+        histogramData = getHistogram(yData, histQ, logScaleBase);
+
         renderHistogram(svg, histogramData, x, y);
     }
 
@@ -136,11 +213,12 @@ function mainCurve() {
         var histogram = d3.layout.histogram()
             .frequency(false)
             .bins(points);
-
+        console.log(histogram(data));
         return histogram(data);
     }
 
     var histQ=HISTOGRAMQ;
+    var logScaleBase=1;  // use =LOGSCALEBASE to start as log scale
 
     redraw();
 }
