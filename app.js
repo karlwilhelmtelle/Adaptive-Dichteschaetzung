@@ -199,7 +199,7 @@ function mainCurve() {
     }
 
     function getHistogram(data, q, logScaleBase) {
-        var dataRange=[d3.min(data), d3.max(data)];
+        var dataRange=[-4, 4];
 
         logScaleBase = (logScaleBase==null?1:logScaleBase);
 
