@@ -1,7 +1,12 @@
 function mainCurve($elem) {
     var HISTOGRAMQ = 1; // Default Q
     var LOGSCALEBASE = 2;
+    var DENSQ = HISTOGRAMQ/8; // Smoothing of the density function, in value units
+    var DENSNORM = 0.8; // Normalizing value of the densityfunction (0-1)
     var TRANSITION_DUR = 750; // ms
+    var CDFQ = HISTOGRAMQ/8;
+    var SHOWCDF = false; // Default value - show cdf function at startup
+    var SHOWDENSITY = false; // Default value - show density function at startup
 
     //setting up empty data array
     var data = [];
@@ -94,6 +99,74 @@ function mainCurve($elem) {
         });
     }
 
+    function getCdf(data, q, xScale, logScaleBase, maxPoints) {
+
+		var maxQ = Math.max(q, (xScale.domain()[1]-xScale.domain()[0])/maxPoints);
+
+		var binnedData = getHistogram(data, maxQ, logScaleBase);
+
+		if (binnedData.length==0)
+			return [];
+
+		var xOffset = binnedData[0].dx/2;
+
+		var cdfData=[];
+		var aggr=0;
+		for (var i=0, len=binnedData.length; i<len; i++) {
+			aggr+=binnedData[i].y;
+			cdfData.push([binnedData[i].x+xOffset, aggr]);
+		}
+
+		// Add termination points
+		cdfData.splice(0,0,[xScale.domain()[0],0]);
+		cdfData.push([xScale.domain()[1],1]);
+
+		return cdfData;
+	}
+
+    function getDensityDistribution(data, q, xScale, normVal, maxPoints) {
+
+		function kernelDensityEstimator(kernel, x) {
+			return function(sample) {
+				return x.map(function(x) {
+					return [x, d3.mean(sample, function(v) { return kernel(x - v); })];
+				});
+			};
+		}
+
+		function epanechnikovKernel(scale) {
+			return function(u) {
+				return Math.abs(u /= scale) <= 1 ? .75 * (1 - u * u) / scale : 0;
+			};
+		}
+
+		var valDomain=xScale.domain()[1] - xScale.domain()[0];
+
+		var nrPoints = Math.min(Math.round(valDomain/q*4), maxPoints);
+		var points = xScale.ticks(nrPoints);
+
+		var densityData = kernelDensityEstimator(epanechnikovKernel(q), points)(data);
+
+		// Normalise
+		var scaleFactor = normVal/d3.max(densityData, function(d) { return d[1] });
+
+		for (var i=0,len=densityData.length;i<len;i++)
+			densityData[i][1]*=scaleFactor;
+
+		// Add termination points
+		densityData.splice(0,0,[0,0]);
+		densityData.push([xScale.domain()[1],0]);
+
+		return densityData;
+	}
+
+    function initStatic(svg) {
+        var linScale = x;
+
+        densityData = getDensityDistribution(data, DENSQ, linScale, DENSNORM, width*2);
+        cdfData = getCdf(data, CDFQ, linScale, 1, width*2);
+    }
+
     // from http://bl.ocks.org/mbostock/4349187
     // Sample from a normal distribution with mean 0, stddev 1.
     function normal() {
@@ -109,6 +182,95 @@ function mainCurve($elem) {
         return x * c; // throw away extra sample y * c
     }
 
+    var redrawNewBin = _.throttle(function (newQ) {
+		histQ = newQ;
+		histogramData = getHistogram(xData, histQ, logScaleBase);
+
+		renderHistogram(svg, histogramData, x, y);
+	}, 200, { leading: false });
+
+    function addControls ($elem) {
+		//// Bin control
+		var binStepper = $('<input>')
+			.css('width', 100);
+
+		// Linear/log scale
+		var logRadio = $('<input type="radio" name="scaleType" value="' + LOGSCALEBASE + '">');
+		var linearRadio = $('<input type="radio" name="scaleType" value="1">');
+
+		(logScaleBase==1?linearRadio:logRadio).attr('checked', 'checked');
+
+		var logAddedMult = $('<span>')
+			.html(logScaleBase==1?'':'(*' + logScaleBase + '<sup>n</sup>)');
+
+		var scaleRadio=$('<span>').append(
+				$('<label>').append(linearRadio, ' Linear').css('cursor', 'pointer'),
+				$('<label>').append(logRadio, ' Log scale').css({'cursor': 'pointer', 'margin-left': 5})
+		).css('margin-left', 20);
+
+		// CDF
+		var cdfCb = $('<input type="checkbox">');
+
+		if (showCdf)
+			cdfCb.attr('checked', 'checked');
+
+		// Density
+		var densCb = $('<input type="checkbox">');
+
+		if (showDensity)
+			densCb.attr('checked', 'checked');
+
+		$('<div>').appendTo($elem).append([
+			$('<span>').append(
+				$('<label>').append('Bin width:').css('margin-right', 5),
+				binStepper,
+				$('<span>').append(logAddedMult).css('margin-left', 3)
+			).css('margin-left', 7),
+			scaleRadio,
+			$('<label>').append(densCb, ' Show density')
+				.css({'cursor': 'pointer', 'margin-left': 25}),
+			$('<label>').append(cdfCb, ' Show cdf')
+				.css({'cursor': 'pointer', 'margin-left': 15})
+		]).css({
+			'text-align': 'center',
+			'margin-top': 5
+		});
+
+		binStepper.slider({
+			step: 0.1,
+			max: 5,
+			min: 0.1,
+			value: HISTOGRAMQ,
+			tooltip: 'always'
+		}).on('change', function(e) {
+			redrawNewBin(e.value.newValue);
+		});
+        /*
+		$.each([linearRadio, logRadio], function() {
+			$(this).change( function() {
+				logScaleBase=parseInt($(this).val());
+				logAddedMult.html(logScaleBase==1?'':'(*' + logScaleBase + '<sup>n</sup>)');
+				xScale = getXScale(data, logScaleBase);
+				setInitZoomLevel();
+				redraw();
+			})
+		});
+        */
+		cdfCb.change( function() {
+			showCdf=this.checked;
+			renderCdf(svg, cdfData, x, y);
+			svg.select('.y2-axis')
+				.transition().duration(TRANSITION_DUR)
+				.style('opacity', (showCdf?1:0));
+		});
+
+		densCb.change( function() {
+			showDensity=this.checked;
+			renderDensity(svg, densityData, x, y);
+		});
+
+	}
+
     //taken from Jason Davies science library
     // https://github.com/jasondavies/science.js/
     function gaussian(x) {
@@ -119,6 +281,96 @@ function mainCurve($elem) {
         x = (x - mean) / sigma;
         return gaussianConstant * Math.exp(-.5 * x * x) / sigma;
     }
+
+    function renderCdf(svg, data, xScale, yScale) {
+
+		var dataFilter = function(d) {
+			return (d[0] >= xScale.domain()[0] && d[0]<=xScale.domain()[1]);
+		};
+
+		// CDF line
+		var line = d3.svg.line()
+			.x(function(d) { return xScale(d[0]); })
+			.y(function(d) { return yScale(d[1]); })
+			.interpolate("basis");
+
+		var lines = svg.selectAll('.cdf-line')
+			.data([(showCdf?data:[])]);
+
+		lines.enter()
+			.append("path")
+			.attr("class", "cdf-line")
+			.style({
+				"fill": "none",
+				"stroke": "green",
+				"stroke-opacity": .4,
+				"stroke-width": "2px"
+			})
+			.on("mouseover", function() {
+				var coords= d3.mouse(this);
+				var x = xScale.invert(coords[0]);
+				var y = yScale.invert(coords[1]);
+
+				d3.select(this).select('title')
+					.text('<' + d3.round(x,2) + ': ' + d3.round(y*100, 2) + '%');
+
+				d3.select(this)
+					.transition()
+					.style({
+						"stroke-width": "3px",
+						"stroke-opacity": .9
+					})
+			})
+			.on("mouseout", function() {
+				svg.select('.cdf-line')
+					.transition()
+					.style({
+						"stroke-width": "2px",
+						"stroke-opacity": .4
+					})
+			})
+			.append('title');
+
+
+		lines
+		  .transition().duration(TRANSITION_DUR)
+			.attr("d", line);
+	}
+
+    function renderDensity(svg, data, xScale, yScale) {
+
+		var dataFilter = function(d) {
+			return (d[0] >= xScale.domain()[0] && d[0]<=xScale.domain()[1]);
+		};
+
+		var thisData = showDensity?data.slice(0):[];
+
+		// Add termination points
+		thisData.splice(0,0,[xScale.domain()[0],0]);
+		thisData.push([xScale.domain()[1],0]);
+
+		var line = d3.svg.line()
+			.x(function(d) { return xScale(d[0]); })
+			.y(function(d) { return yScale(d[1]); })
+			.interpolate("basis");
+
+		var lines = svg.selectAll('.density-line')
+			.data([thisData]);
+
+		lines.enter()
+			.append("path")
+			.attr("class", "density-line")
+			.style({
+				"fill": "blue",
+				"fill-opacity": .13,
+				"stroke": "none"
+			});
+
+		lines
+		  //.datum(function(d) { return d; })
+		  .transition().duration(TRANSITION_DUR)
+			  .attr("d", line);
+	}
 
     function renderHistogram(svg, data, xScale, yScale) {
 		var dataFilter = function(d) {
@@ -198,7 +450,9 @@ function mainCurve($elem) {
     function redraw() {
         histogramData = getHistogram(xData, histQ, logScaleBase);
 
+        renderDensity(svg, densityData, x, y);
         renderHistogram(svg, histogramData, x, y);
+        renderCdf(svg, cdfData, x, y);
     }
 
     function getHistogram(data, q, logScaleBase) {
@@ -224,6 +478,13 @@ function mainCurve($elem) {
 
     var histQ=HISTOGRAMQ;
     var logScaleBase=1;  // use =LOGSCALEBASE to start as log scale
+    var showCdf = SHOWCDF;
+    var showDensity = SHOWDENSITY;
+    var densityData = null;
+	var cdfData = null;
 
+
+    initStatic(svg);
+    addControls($elem);
     redraw();
 }
