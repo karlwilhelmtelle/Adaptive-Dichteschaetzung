@@ -1,4 +1,4 @@
-function mainCurve() {
+function mainCurve($elem) {
     var HISTOGRAMQ = 1; // Default Q
     var LOGSCALEBASE = 2;
     var TRANSITION_DUR = 750; // ms
