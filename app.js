@@ -163,7 +163,10 @@ function mainCurve() {
 			.attr("height", 0)
 			.transition().duration(TRANSITION_DUR)
 				.attr("y", function(d) { return yScale(d.y); })
-				.attr("height", function(d) { return height - yScale(d.y); });
+				.attr("height", function(d) { 
+                    var dHeight = height - yScale(d.y);
+                    return Math.max(0, dHeight); 
+                });
 
 
 		newBars
