@@ -195,6 +195,7 @@ function mainCurve($elem) {
 			.css('width', 100);
 
 		// Linear/log scale
+        /*
 		var logRadio = $('<input type="radio" name="scaleType" value="' + LOGSCALEBASE + '">');
 		var linearRadio = $('<input type="radio" name="scaleType" value="1">');
 
@@ -207,7 +208,7 @@ function mainCurve($elem) {
 				$('<label>').append(linearRadio, ' Linear').css('cursor', 'pointer'),
 				$('<label>').append(logRadio, ' Log scale').css({'cursor': 'pointer', 'margin-left': 5})
 		).css('margin-left', 20);
-
+        */
 		// CDF
 		var cdfCb = $('<input type="checkbox">');
 
@@ -223,10 +224,10 @@ function mainCurve($elem) {
 		$('<div>').appendTo($elem).append([
 			$('<span>').append(
 				$('<label>').append('Bin width:').css('margin-right', 5),
-				binStepper,
-				$('<span>').append(logAddedMult).css('margin-left', 3)
+				binStepper/*,
+				$('<span>').append(logAddedMult).css('margin-left', 3)*/
 			).css('margin-left', 7),
-			scaleRadio,
+			//scaleRadio,
 			$('<label>').append(densCb, ' Show density')
 				.css({'cursor': 'pointer', 'margin-left': 25}),
 			$('<label>').append(cdfCb, ' Show cdf')
