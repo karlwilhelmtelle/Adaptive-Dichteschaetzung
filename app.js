@@ -65,8 +65,6 @@ function mainCurve() {
         .attr("class", "line")
         .attr("d", line);
 
-    redraw();
-
     function getData() {
         // loop to populate data array with 
         // probabily - quantile pairs
@@ -117,6 +115,7 @@ function mainCurve() {
         histogramData = getHistogram(data, histQ, logScaleBase);
         yScale = getYScale(histogramData, xScale.domain());
 
+        
         renderHistogram(svg, histogramData, x, y);
     }
 
@@ -140,4 +139,8 @@ function mainCurve() {
 
         return histogram(data);
     }
+
+    var histQ=HISTOGRAMQ;
+
+    redraw();
 }
