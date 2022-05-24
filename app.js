@@ -72,7 +72,7 @@ function mainCurve() {
     function getData() {
         // loop to populate data array with 
         // probabily - quantile pairs
-        for (var i = 0; i < 100000; i++) {
+        for (var i = 0; i < 1e5; i++) {
             q = normal();
             p = gaussian(q) // calc prob of rand draw
             el = {
