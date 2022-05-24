@@ -5,6 +5,7 @@ function mainCurve() {
 
     //setting up empty data array
     var data = [];
+    var xData = [];
     var yData = [];
 
     getData(); // popuate data 
@@ -87,8 +88,9 @@ function mainCurve() {
             return x.q - y.q;
         });
 
-        yData = data.map(function (el) {
-            return el.p;
+        data.forEach(function (el) {
+            xData.push(el.q);
+            yData.push(el.p);
         });
     }
 
@@ -138,7 +140,7 @@ function mainCurve() {
 		  .attr("x", function(d) { return xScale(d.x); })
 		  .attr("y", function(d) { return yScale(d.y); })
 		  .attr("width", function(d) { return xScale(d.x + d.dx) - xScale(d.x); })
-		  .attr("height", function(d) { return GRAPH_H - yScale(d.y); });
+		  .attr("height", function(d) { return height - yScale(d.y); });
 
 		var newBars = bars.enter()
 		  .append("rect")
@@ -191,13 +193,13 @@ function mainCurve() {
 	}
 
     function redraw() {
-        histogramData = getHistogram(yData, histQ, logScaleBase);
+        histogramData = getHistogram(xData, histQ, logScaleBase);
 
         renderHistogram(svg, histogramData, x, y);
     }
 
     function getHistogram(data, q, logScaleBase) {
-        var dataRange=[0, d3.max(data)];
+        var dataRange=[d3.min(data), d3.max(data)];
 
         logScaleBase = (logScaleBase==null?1:logScaleBase);
 
