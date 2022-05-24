@@ -392,7 +392,10 @@ function mainCurve($elem) {
 		  .attr("x", function(d) { return xScale(d.x); })
 		  .attr("y", function(d) { return yScale(d.y); })
 		  .attr("width", function(d) { return xScale(d.x + d.dx) - xScale(d.x); })
-		  .attr("height", function(d) { return height - yScale(d.y); });
+		  .attr("height", function(d) { 
+                var dHeight = height - yScale(d.y);
+                return Math.max(0, dHeight); 
+            });
 
 		var newBars = bars.enter()
 		  .append("rect")
