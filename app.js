@@ -188,7 +188,7 @@ function mainCurve() {
 
 		bars.select('title')
 			.text(function(d) {
-				return d.x + '-' + (d.x+d.dx) + " bin: " + d3.round(d.y*100,2) + "% (" + d.length + " samples)";
+				return d.x + ' bis ' + (d.x+d.dx) + ": " + d3.round(d.y*100,2) + "% (" + d.length + " samples)";
 			});
 	}
 
