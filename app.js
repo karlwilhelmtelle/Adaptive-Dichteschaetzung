@@ -199,7 +199,7 @@ function mainCurve() {
     }
 
     function getHistogram(data, q, logScaleBase) {
-        var dataRange=[-4, 4];
+        var dataRange=[-5, 5];
 
         logScaleBase = (logScaleBase==null?1:logScaleBase);
 
