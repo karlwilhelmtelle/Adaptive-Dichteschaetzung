@@ -162,6 +162,7 @@ function mainCurve($elem) {
 
     function initStatic(svg) {
         var linScale = x;
+        y2Scale = getY2Scale();
 
         densityData = getDensityDistribution(xData, DENSQ, linScale, DENSNORM/2, width*2);
         cdfData = getCdf(xData, CDFQ, linScale, 1, width/2);
@@ -259,7 +260,7 @@ function mainCurve($elem) {
         */
 		cdfCb.change( function() {
 			showCdf=this.checked;
-			renderCdf(svg, cdfData, x, y);
+			renderCdf(svg, cdfData, x, y2Scale);
 			svg.select('.y2-axis')
 				.transition().duration(TRANSITION_DUR)
 				.style('opacity', (showCdf?1:0));
@@ -282,6 +283,12 @@ function mainCurve($elem) {
         x = (x - mean) / sigma;
         return gaussianConstant * Math.exp(-.5 * x * x) / sigma;
     }
+
+    function getY2Scale() {
+		return d3.scale.linear()
+			.domain([0, 1])
+			.range([height, 0]);
+	}
 
     function renderCdf(svg, data, xScale, yScale) {
 
@@ -456,7 +463,7 @@ function mainCurve($elem) {
 
         renderDensity(svg, densityData, x, y);
         renderHistogram(svg, histogramData, x, y);
-        renderCdf(svg, cdfData, x, y);
+        renderCdf(svg, cdfData, x, y2Scale);
     }
 
     function getHistogram(data, q, logScaleBase) {
@@ -486,7 +493,7 @@ function mainCurve($elem) {
     var showDensity = SHOWDENSITY;
     var densityData = null;
 	var cdfData = null;
-
+    var y2Scale = null;
 
     initStatic(svg);
     addControls($elem);
