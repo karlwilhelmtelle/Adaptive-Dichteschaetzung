@@ -6,7 +6,7 @@ function mainCurve($elem) {
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
     var SHOWCDF = false; // Default value - show cdf function at startup
-    var SHOWDENSITY = false; // Default value - show density function at startup
+    var SHOWDENSITY = true; // Default value - show density function at startup
 
     //setting up empty data array
     var data = [];
@@ -163,8 +163,8 @@ function mainCurve($elem) {
     function initStatic(svg) {
         var linScale = x;
 
-        densityData = getDensityDistribution(data, DENSQ, linScale, DENSNORM, width*2);
-        cdfData = getCdf(data, CDFQ, linScale, 1, width*2);
+        densityData = getDensityDistribution(xData, DENSQ, linScale, DENSNORM/2, width*2);
+        cdfData = getCdf(xData, CDFQ, linScale, 1, width/2);
     }
 
     // from http://bl.ocks.org/mbostock/4349187
