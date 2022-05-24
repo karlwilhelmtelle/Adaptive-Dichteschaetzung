@@ -62,6 +62,8 @@ svg.append("path")
     .attr("class", "line")
     .attr("d", line);
 
+redraw();
+
 function getData() {
     // loop to populate data array with 
     // probabily - quantile pairs
@@ -106,4 +108,32 @@ function gaussian(x) {
 
     x = (x - mean) / sigma;
     return gaussianConstant * Math.exp(-.5 * x * x) / sigma;
-};
+}
+
+function redraw() {
+    histogramData = getHistogram(data, histQ, logScaleBase);
+    yScale = getYScale(histogramData, xScale.domain());
+
+    renderHistogram(svg, histogramData, x, y);
+}
+
+function getHistogram(data, q, logScaleBase) {
+    var dataRange=[0, d3.max(data)];
+
+    logScaleBase = (logScaleBase==null?1:logScaleBase);
+
+    var base=1/logScaleBase;
+    var expQ=Math.pow(q*Math.pow(base,4) , base);  // Incremental Q
+
+    var points = [];
+    for (var p = Math.pow(dataRange[0], base),len=Math.pow(dataRange[1], base); p<len; p+=expQ)
+        points.push(d3.round(Math.pow(p,1/base), 2));
+
+    points.push(d3.round(dataRange[1], 2));
+
+    var histogram = d3.layout.histogram()
+        .frequency(false)
+        .bins(points);
+
+    return histogram(data);
+}
