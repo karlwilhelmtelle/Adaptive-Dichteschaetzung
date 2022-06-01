@@ -1,4 +1,4 @@
-function mainCurve($elem) {
+function mainCurve($elem, inputData) {
     var HISTOGRAMQ = 1; // Default Q
     var LOGSCALEBASE = 2;
     var DENSQ = HISTOGRAMQ/8; // Smoothing of the density function, in value units
@@ -53,13 +53,6 @@ function mainCurve($elem) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    x.domain(d3.extent(data, function(d) {
-        return d.q;
-    }));
-    y.domain(d3.extent(data, function(d) {
-        return d.p;
-    }));
-
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
@@ -69,13 +62,35 @@ function mainCurve($elem) {
         .attr("class", "y axis")
         .call(yAxis);
 
-    svg.append("path")
-        .datum(data)
-        .attr("class", "line")
-        .attr("d", line);
+	if (inputData === undefined) {
+		x.domain(d3.extent(data, function(d) {
+			return d.q;
+		}));
+		y.domain(d3.extent(data, function(d) {
+			return d.p;
+		}));
+		svg.append("path")
+			.datum(data)
+			.attr("class", "line")
+			.attr("d", line);
+	} else {
+		x.domain([d3.min(xData) - 10, d3.max(xData) + 10]);
+		y.domain([0, 1]);
+	}
 
     function getData() {
-        // loop to populate data array with 
+        if (inputData === undefined) {
+			createGaussianData();
+		} else {
+			console.log("before", inputData);
+			inputData.sort();
+			console.log("after", inputData);
+			xData = inputData;
+		}
+    }
+
+	function createGaussianData() {
+		// loop to populate data array with 
         // probabily - quantile pairs
         for (var i = 0; i < 1e5; i++) {
             q = normal();
@@ -87,7 +102,7 @@ function mainCurve($elem) {
             data.push(el)
         };
 
-        // need to sort for plotting
+		// need to sort for plotting
         //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
         data.sort(function(x, y) {
             return x.q - y.q;
@@ -97,7 +112,7 @@ function mainCurve($elem) {
             xData.push(el.q);
             yData.push(el.p);
         });
-    }
+	}
 
     function getCdf(data, q, xScale, logScaleBase, maxPoints) {
 
