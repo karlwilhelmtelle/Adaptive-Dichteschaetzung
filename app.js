@@ -2,6 +2,9 @@ function mainCurve($elem, inputData) {
     var HISTOGRAMQ = 1; // Default Q
     var LOGSCALEBASE = 2;
     var DENSQ = HISTOGRAMQ/8; // Smoothing of the density function, in value units
+	if (inputData !== undefined) {
+		DENSQ = 7;
+	}
     var DENSNORM = 0.8; // Normalizing value of the densityfunction (0-1)
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
