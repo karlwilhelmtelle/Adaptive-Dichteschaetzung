@@ -56,7 +56,7 @@ function mainCurve($elem, inputData) {
 			.attr("class", "line")
 			.attr("d", line);
 	} else {
-		x.domain([d3.min(xData) - 10, d3.max(xData) + 10]);
+		x.domain([d3.min(xData) - 5, d3.max(xData) + 5]);
 		y.domain([0, 1]);
 	}
 
@@ -485,7 +485,7 @@ function mainCurve($elem, inputData) {
 		if (inputData === undefined) {
 			dataRange=[-5, 5];
 		} else {
-			dataRange = d3.extent(data);
+			dataRange = [d3.min(data) - 10, d3.max(data) + 10];
 		}
 		logScaleBase = (logScaleBase==null?1:logScaleBase);
 
