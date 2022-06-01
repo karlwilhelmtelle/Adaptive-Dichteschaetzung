@@ -481,29 +481,27 @@ function mainCurve($elem, inputData) {
     }
 
     function getHistogram(data, q, logScaleBase) {
-		var histogram;
+		var dataRange;
 		if (inputData === undefined) {
-			var dataRange=[-5, 5];
-
-			logScaleBase = (logScaleBase==null?1:logScaleBase);
-
-			var base=1/logScaleBase;
-			var expQ=Math.pow(q*Math.pow(base,4) , base);  // Incremental Q
-
-			var points = [];
-			for (var p = Math.pow(dataRange[0], base),len=Math.pow(dataRange[1], base); p<len; p+=expQ)
-				points.push(d3.round(Math.pow(p,1/base), 2));
-
-			points.push(d3.round(dataRange[1], 2));
-
-			histogram = d3.layout.histogram()
-				.frequency(false)
-				.bins(points);
+			dataRange=[-5, 5];
 		} else {
-			histogram = d3.layout.histogram()
-				.frequency(false)
-				.bins(40);
-		}        
+			dataRange = d3.extent(data);
+		}
+		logScaleBase = (logScaleBase==null?1:logScaleBase);
+
+		var base=1/logScaleBase;
+		var expQ=Math.pow(q*Math.pow(base,4) , base);  // Incremental Q
+
+		var points = [];
+		for (var p = Math.pow(dataRange[0], base),len=Math.pow(dataRange[1], base); p<len; p+=expQ)
+			points.push(d3.round(Math.pow(p,1/base), 2));
+
+		points.push(d3.round(dataRange[1], 2));
+
+		histogram = d3.layout.histogram()
+			.frequency(false)
+			.bins(points);
+		
         return histogram(data);
     }
 
