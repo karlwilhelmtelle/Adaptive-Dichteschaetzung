@@ -82,9 +82,7 @@ function mainCurve($elem, inputData) {
         if (inputData === undefined) {
 			createGaussianData();
 		} else {
-			console.log("before", inputData);
 			inputData.sort();
-			console.log("after", inputData);
 			xData = inputData;
 		}
     }
@@ -500,7 +498,6 @@ function mainCurve($elem, inputData) {
         var histogram = d3.layout.histogram()
             .frequency(false)
             .bins(points);
-        console.log(histogram(data));
         return histogram(data);
     }
 
