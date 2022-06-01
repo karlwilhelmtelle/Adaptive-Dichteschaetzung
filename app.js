@@ -1,5 +1,5 @@
 function mainCurve($elem) {
-    var HISTOGRAMQ = 1; // Default Q
+    var HISTOGRAMQ = 0.1; // Default Q
     var LOGSCALEBASE = 2;
     var DENSQ = HISTOGRAMQ/8; // Smoothing of the density function, in value units
     var DENSNORM = 0.8; // Normalizing value of the densityfunction (0-1)
@@ -398,10 +398,11 @@ function mainCurve($elem) {
 
 	   bars.transition().duration(TRANSITION_DUR)
 		  .attr("x", function(d) { return xScale(d.x); })
-		  .attr("y", function(d) { return yScale(d.y); })
+		  .attr("y", function(d) { return yScale(d.y / d.dx); })
 		  .attr("width", function(d) { return xScale(d.x + d.dx) - xScale(d.x); })
-		  .attr("height", function(d) { 
+		  .attr("height", function(d) {
                 var dHeight = height - yScale(d.y);
+				dHeight /= d.dx;
                 return Math.max(0, dHeight); 
             });
 
@@ -425,9 +426,10 @@ function mainCurve($elem) {
 			.attr("y", height)
 			.attr("height", 0)
 			.transition().duration(TRANSITION_DUR)
-				.attr("y", function(d) { return yScale(d.y); })
-				.attr("height", function(d) { 
+				.attr("y", function(d) { return yScale(d.y / d.dx); })
+				.attr("height", function(d) {
                     var dHeight = height - yScale(d.y);
+					dHeight /= d.dx;
                     return Math.max(0, dHeight); 
                 });
 
