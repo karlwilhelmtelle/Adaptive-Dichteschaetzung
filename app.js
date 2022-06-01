@@ -56,7 +56,7 @@ function mainCurve($elem, inputData) {
 			.attr("class", "line")
 			.attr("d", line);
 	} else {
-		x.domain([d3.min(xData) - 5, d3.max(xData) + 5]);
+		x.domain([d3.min(xData) - 10, d3.max(xData) + 10]);
 		y.domain([0, 1]);
 	}
 
