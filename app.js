@@ -1,5 +1,5 @@
 function mainCurve($elem) {
-    var HISTOGRAMQ = 0.1; // Default Q
+    var HISTOGRAMQ = 1; // Default Q
     var LOGSCALEBASE = 2;
     var DENSQ = HISTOGRAMQ/8; // Smoothing of the density function, in value units
     var DENSNORM = 0.8; // Normalizing value of the densityfunction (0-1)
