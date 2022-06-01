@@ -39,14 +39,6 @@ function mainCurve($elem, inputData) {
         .scale(y)
         .orient("left");
 
-    var line = d3.svg.line()
-        .x(function(d) {
-            return x(d.q);
-        })
-        .y(function(d) {
-            return y(d.p);
-        });
-
     var svg = d3.select("body").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
@@ -69,6 +61,13 @@ function mainCurve($elem, inputData) {
 		y.domain(d3.extent(data, function(d) {
 			return d.p;
 		}));
+		var line = d3.svg.line()
+			.x(function(d) {
+				return x(d.q);
+			})
+			.y(function(d) {
+				return y(d.p);
+			});
 		svg.append("path")
 			.datum(data)
 			.attr("class", "line")
