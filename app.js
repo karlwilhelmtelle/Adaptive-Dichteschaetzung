@@ -237,12 +237,28 @@ function mainCurve($elem, inputData) {
 		if (showDensity)
 			densCb.attr('checked', 'checked');
 
-		$('<div>').appendTo($elem).append([
-			$('<span>').append(
+		var binWidthSpan = $('<span>');
+		if (inputData === undefined) {
+			binWidthSpan = $('<span>').append(
 				$('<label>').append('Bin width:').css('margin-right', 5),
 				binStepper/*,
 				$('<span>').append(logAddedMult).css('margin-left', 3)*/
-			).css('margin-left', 7),
+			).css('margin-left', 7);
+
+			binStepper.slider({
+				step: 0.1,
+				max: 5,
+				min: 0.1,
+				value: HISTOGRAMQ,
+				tooltip: 'always'
+			}).on('change', function(e) {
+				redrawNewBin(e.value.newValue);
+			});
+		} 
+		
+		
+		$('<div>').appendTo($elem).append([
+			binWidthSpan,
 			//scaleRadio,
 			$('<label>').append(densCb, ' Show density')
 				.css({'cursor': 'pointer', 'margin-left': 25}),
@@ -253,15 +269,6 @@ function mainCurve($elem, inputData) {
 			'margin-top': 5
 		});
 
-		binStepper.slider({
-			step: 0.1,
-			max: 5,
-			min: 0.1,
-			value: HISTOGRAMQ,
-			tooltip: 'always'
-		}).on('change', function(e) {
-			redrawNewBin(e.value.newValue);
-		});
         /*
 		$.each([linearRadio, logRadio], function() {
 			$(this).change( function() {
@@ -476,10 +483,15 @@ function mainCurve($elem, inputData) {
 	}
 
     function redraw() {
-        histogramData = getHistogram(xData, histQ, logScaleBase);
+		var histogramData;
+		if (inputData === undefined) {
+			histogramData = getHistogram(xData, histQ, logScaleBase);
+		} else {
+			histogramData = getAdaptiveHistogram(xData);
+		}
 
-        renderDensity(svg, densityData, x, y);
-        renderHistogram(svg, histogramData, x, y);
+		renderDensity(svg, densityData, x, y);
+		renderHistogram(svg, histogramData, x, y);
         renderCdf(svg, cdfData, x, y2Scale);
     }
 
@@ -504,9 +516,30 @@ function mainCurve($elem, inputData) {
 		histogram = d3.layout.histogram()
 			.frequency(false)
 			.bins(points);
-		
+			
         return histogram(data);
-    }
+	}
+	
+	function getAdaptiveHistogram(data) {
+		var n = data.length;
+		var sqrtN = Math.round(Math.sqrt(n));
+		
+		var points = [];
+
+		for (var i = 0; i < n; i += sqrtN) {
+			var x = data[i];
+			var x2 = data[Math.min(i + sqrtN, n - 1)];
+			var dx = x2 - x;
+			var y = 0.5;
+			points.push({
+				x: x,
+				dx: dx,
+				y: y
+			});
+		}
+		console.log(points);
+		return points;
+	}
 
     var histQ=HISTOGRAMQ;
     var logScaleBase=1;  // use =LOGSCALEBASE to start as log scale
