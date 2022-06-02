@@ -475,10 +475,14 @@ function mainCurve($elem, inputData) {
 			});
 
 		newBars.append('title');
-
+		var sqrtN = Math.round(Math.sqrt(xData.length));
+		var percentage = xData.length / sqrtN;
 		bars.select('title')
 			.text(function(d) {
-				return d.x + ' bis ' + (d.x+d.dx) + ": " + d3.round(d.y*100,2) + "% (" + d.length + " Sample)";
+				if (inputData === undefined) {
+					percentage = d3.round(d.y*100,2);
+				}
+				return d.x + ' bis ' + (d.x+d.dx) + ": " + percentage + "% (" + d.length + " Sample)";
 			});
 	}
 
