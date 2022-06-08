@@ -191,6 +191,7 @@ function mainCurve($elem, inputData) {
 
 		var valDomain=xScale.domain()[1] - xScale.domain()[0];
 		var nrPoints = Math.min(Math.round(valDomain/q*4), maxPoints);
+		nrPoints = Math.max(nrPoints, Math.round(valDomain));
 		var points = xScale.ticks(nrPoints);
 
 		var densityData = kernelDensityEstimator(epanechnikovKernel, points)(data);
