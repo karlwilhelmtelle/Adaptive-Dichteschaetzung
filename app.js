@@ -165,6 +165,7 @@ function mainCurve($elem, inputData) {
 			} else {
 				scale = 0.5 * q / samplesInArea;
 			}
+			console.log("x", x, "scale", scale);
 			return scale;
 		}
 
