@@ -476,7 +476,6 @@ function mainCurve($elem, inputData) {
 
 		newBars.append('title');
 		var sqrtN = d3.round(Math.sqrt(xData.length));
-		console.log(xData);
 		var percentage = d3.round(100 * sqrtN / xData.length, 2);
 		bars.select('title')
 			.text(function(d) {
@@ -544,7 +543,6 @@ function mainCurve($elem, inputData) {
 				length: sqrtN
 			});
 		}
-		console.log(points);
 		return points;
 	}
 
