@@ -475,14 +475,16 @@ function mainCurve($elem, inputData) {
 			});
 
 		newBars.append('title');
-		var sqrtN = Math.round(Math.sqrt(xData.length));
-		var percentage = xData.length / sqrtN;
+		var sqrtN = d3.round(Math.sqrt(xData.length));
+		console.log(xData);
+		var percentage = d3.round(100 * sqrtN / xData.length, 2);
 		bars.select('title')
 			.text(function(d) {
 				if (inputData === undefined) {
 					percentage = d3.round(d.y*100,2);
 				}
-				return d.x + ' bis ' + (d.x+d.dx) + ": " + percentage + "% (" + d.length + " Sample)";
+				return d.x + ' bis ' + (d.x+d.dx) + ": " + 
+				percentage + "% (" + d.length + " Sample)";
 			});
 	}
 
@@ -538,7 +540,8 @@ function mainCurve($elem, inputData) {
 			points.push({
 				x: x,
 				dx: dx,
-				y: y
+				y: y,
+				length: sqrtN
 			});
 		}
 		console.log(points);
