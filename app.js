@@ -141,10 +141,43 @@ function mainCurve($elem, inputData) {
 
     function getDensityDistribution(data, q, xScale, normVal, maxPoints) {
 
-		function kernelDensityEstimator(kernel, x) {
+		function getNumberOfSamplesInArea(x, radius, sample) {
+			var sum = 0;
+			var n = sample.length;
+			for (var i = 0; i < n; i++) {
+				var xVal = sample[i];
+				var left = x - radius;
+				var right = x + radius;
+				if (xVal > right) {
+					break;
+				}
+				if (xVal >= left && xVal <= right) {
+					sum++;
+				}
+			}
+			return sum;
+		}
+
+		function getScaleFromPosition(x, sample) {
+			var samplesInArea = getNumberOfSamplesInArea(x, 1, sample);
+			if (samplesInArea == 0) {
+				scale = 2 * q;
+			} else {
+				scale = 0.5 * q / samplesInArea;
+			}
+			return scale;
+		}
+
+		function kernelDensityEstimator(kernelFunc, x) {
 			return function(sample) {
 				return x.map(function(x) {
-					return [x, d3.mean(sample, function(v) { return kernel(x - v); })];
+					var scale = q;
+					if (inputData !== undefined) {
+						scale = getScaleFromPosition(x, sample);
+					}
+					return [x, d3.mean(sample, function(v) {
+						return kernelFunc(scale)(x - v); 
+					})];
 				});
 			};
 		}
@@ -156,12 +189,11 @@ function mainCurve($elem, inputData) {
 		}
 
 		var valDomain=xScale.domain()[1] - xScale.domain()[0];
-
 		var nrPoints = Math.min(Math.round(valDomain/q*4), maxPoints);
 		var points = xScale.ticks(nrPoints);
 
-		var densityData = kernelDensityEstimator(epanechnikovKernel(q), points)(data);
-
+		var densityData = kernelDensityEstimator(epanechnikovKernel, points)(data);
+		
 		// Normalise
 		var scaleFactor = normVal/d3.max(densityData, function(d) { return d[1] });
 
@@ -171,7 +203,6 @@ function mainCurve($elem, inputData) {
 		// Add termination points
 		densityData.splice(0,0,[0,0]);
 		densityData.push([xScale.domain()[1],0]);
-
 		return densityData;
 	}
 
