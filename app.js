@@ -165,7 +165,7 @@ function mainCurve($elem, inputData) {
 			} else {
 				scale = 0.5 * q / samplesInArea;
 			}
-			console.log("x", x, "scale", scale);
+			//console.log("x", x, "scale", scale);
 			return scale;
 		}
 
@@ -568,7 +568,7 @@ function mainCurve($elem, inputData) {
 			var x = data[i];
 			var x2 = data[Math.min(i + sqrtN, n - 1)];
 			var dx = x2 - x;
-			var y = 0.5 * 0.1;
+			var y = 1 / sqrtN;
 			points.push({
 				x: x,
 				dx: dx,
@@ -576,6 +576,7 @@ function mainCurve($elem, inputData) {
 				length: sqrtN
 			});
 		}
+		console.log(points);
 		return points;
 	}
 
