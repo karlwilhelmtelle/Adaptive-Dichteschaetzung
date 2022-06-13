@@ -1,9 +1,8 @@
 function mainCurve($elem, inputData) {
     var HISTOGRAMQ = 1; // Default Q
-    var LOGSCALEBASE = 2;
     var DENSQ = HISTOGRAMQ/8; // Smoothing of the density function, in value units
 	if (inputData !== undefined) {
-		DENSQ = 10;
+		DENSQ = 40;
 	}
     var DENSNORM = 1; // Normalizing value of the densityfunction (0-1)
     var TRANSITION_DUR = 750; // ms
@@ -189,22 +188,22 @@ function mainCurve($elem, inputData) {
 			};
 		}
 
-		var valDomain=xScale.domain()[1] - xScale.domain()[0];
-		var nrPoints = Math.min(Math.round(valDomain/q*4), maxPoints);
-		nrPoints = Math.max(nrPoints, Math.round(valDomain));
+		var nrPoints = Math.round(maxPoints / 2);
 		var points = xScale.ticks(nrPoints);
+		console.log(maxPoints, nrPoints);
 
 		var densityData = kernelDensityEstimator(epanechnikovKernel, points)(data);
 		
 		// Normalise
-		var scaleFactor = 1//normVal/d3.max(densityData, function(d) { return d[1] });
+		/*var scaleFactor = 1//normVal/d3.max(densityData, function(d) { return d[1] });
 
 		for (var i=0,len=densityData.length;i<len;i++)
-			densityData[i][1]*=scaleFactor;
+			densityData[i][1]*=scaleFactor;*/
 
 		// Add termination points
 		densityData.splice(0,0,[0,0]);
 		densityData.push([xScale.domain()[1],0]);
+		console.log(densityData);
 		return densityData;
 	}
 
@@ -212,7 +211,7 @@ function mainCurve($elem, inputData) {
         var linScale = x;
         y2Scale = getY2Scale();
 
-        densityData = getDensityDistribution(xData, DENSQ, linScale, DENSNORM/2, width*2);
+        densityData = getDensityDistribution(xData, DENSQ, linScale, DENSNORM/2, width);
         cdfData = getCdf(xData, CDFQ, linScale, 1, width/2);
     }
 
@@ -577,8 +576,7 @@ function mainCurve($elem, inputData) {
 				y: y,
 				length: sqrtN
 			});
-		}
-		console.log(points);
+		}		
 		return points;
 	}
 
