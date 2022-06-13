@@ -3,9 +3,9 @@ function mainCurve($elem, inputData) {
     var LOGSCALEBASE = 2;
     var DENSQ = HISTOGRAMQ/8; // Smoothing of the density function, in value units
 	if (inputData !== undefined) {
-		DENSQ = 7;
+		DENSQ = 10;
 	}
-    var DENSNORM = 0.8; // Normalizing value of the densityfunction (0-1)
+    var DENSNORM = 1; // Normalizing value of the densityfunction (0-1)
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
     var SHOWCDF = false; // Default value - show cdf function at startup
@@ -60,7 +60,7 @@ function mainCurve($elem, inputData) {
 			.attr("d", line);
 	} else {
 		x.domain([d3.min(xData) - 10, d3.max(xData) + 10]);
-		y.domain([0, 1]);
+		y.domain([0, 0.1]);
 	}
 
     var xAxis = d3.svg.axis()
@@ -173,19 +173,19 @@ function mainCurve($elem, inputData) {
 			return function(sample) {
 				return x.map(function(x) {
 					var scale = q;
-					if (inputData !== undefined) {
-						scale = getScaleFromPosition(x, sample);
-					}
 					return [x, d3.mean(sample, function(v) {
-						return kernelFunc(scale)(x - v); 
+						if (inputData !== undefined) {
+							scale = getScaleFromPosition(v, sample);
+						}
+						return kernelFunc()((x - v) / scale) / scale; 
 					})];
 				});
 			};
 		}
 
-		function epanechnikovKernel(scale) {
+		function epanechnikovKernel() {
 			return function(u) {
-				return Math.abs(u /= scale) <= 1 ? .75 * (1 - u * u) / scale : 0;
+				return Math.abs(u) <= 1 ? .75 * (1 - u * u) : 0;
 			};
 		}
 
@@ -197,7 +197,7 @@ function mainCurve($elem, inputData) {
 		var densityData = kernelDensityEstimator(epanechnikovKernel, points)(data);
 		
 		// Normalise
-		var scaleFactor = normVal/d3.max(densityData, function(d) { return d[1] });
+		var scaleFactor = 1//normVal/d3.max(densityData, function(d) { return d[1] });
 
 		for (var i=0,len=densityData.length;i<len;i++)
 			densityData[i][1]*=scaleFactor;
@@ -568,7 +568,7 @@ function mainCurve($elem, inputData) {
 			var x = data[i];
 			var x2 = data[Math.min(i + sqrtN, n - 1)];
 			var dx = x2 - x;
-			var y = 0.5;
+			var y = 0.5 * 0.1;
 			points.push({
 				x: x,
 				dx: dx,
