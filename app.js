@@ -515,8 +515,11 @@ function mainCurve($elem, inputData) {
 				if (inputData === undefined) {
 					percentage = d3.round(d.y*100,2);
 				}
+				var barHeight = d.y / d.dx;
 				return d.x + ' bis ' + (d.x+d.dx) + ": " + 
-				percentage + "% (" + d.length + " Sample)";
+				percentage + "% (" + d.length + " Sample)\n" + 
+				"Hoehe: " + d3.round(barHeight, 2) + "\n" +
+				"Flaeche: " + d3.round(d.dx * barHeight, 4);
 			});
 	}
 
@@ -563,12 +566,11 @@ function mainCurve($elem, inputData) {
 		var sqrtN = Math.round(Math.sqrt(n));
 		
 		var points = [];
-
+		var y = sqrtN / n;
 		for (var i = 0; i < n; i += sqrtN) {
 			var x = data[i];
 			var x2 = data[Math.min(i + sqrtN, n - 1)];
 			var dx = x2 - x;
-			var y = 1 / sqrtN;
 			points.push({
 				x: x,
 				dx: dx,
