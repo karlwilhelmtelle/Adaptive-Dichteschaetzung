@@ -138,7 +138,7 @@ function mainCurve($elem, inputData) {
 		return cdfData;
 	}
 
-    function getDensityDistribution(data, q, xScale, normVal, maxPoints) {
+    function getDensityDistribution(data, q, xScale, maxPoints) {
 
 		function getNumberOfSamplesInArea(x, radius, sample) {
 			var sum = 0;
@@ -194,12 +194,6 @@ function mainCurve($elem, inputData) {
 
 		var densityData = kernelDensityEstimator(epanechnikovKernel, points)(data);
 		
-		// Normalise
-		/*var scaleFactor = 1//normVal/d3.max(densityData, function(d) { return d[1] });
-
-		for (var i=0,len=densityData.length;i<len;i++)
-			densityData[i][1]*=scaleFactor;*/
-
 		// Add termination points
 		densityData.splice(0,0,[0,0]);
 		densityData.push([xScale.domain()[1],0]);
@@ -211,7 +205,7 @@ function mainCurve($elem, inputData) {
         var linScale = x;
         y2Scale = getY2Scale();
 
-        densityData = getDensityDistribution(xData, DENSQ, linScale, DENSNORM/2, width);
+        densityData = getDensityDistribution(xData, DENSQ, linScale, width);
         cdfData = getCdf(xData, CDFQ, linScale, 1, width/2);
     }
 
