@@ -93,7 +93,7 @@ function mainCurve($elem, inputData) {
         // probabily - quantile pairs
         for (var i = 0; i < 1e5; i++) {
             q = normal();
-            p = gaussian(q) // calc prob of rand draw
+            p = standardNormalDistribution(q) // calc prob of rand draw
             el = {
                 "q": q,
                 "p": p
@@ -323,13 +323,8 @@ function mainCurve($elem, inputData) {
 
     //taken from Jason Davies science library
     // https://github.com/jasondavies/science.js/
-    function gaussian(x) {
-        var gaussianConstant = 1 / Math.sqrt(2 * Math.PI),
-            mean = 0,
-            sigma = 1;
-
-        x = (x - mean) / sigma;
-        return gaussianConstant * Math.exp(-.5 * x * x) / sigma;
+    function standardNormalDistribution(x) {
+        return gaussianDistribution(0, 1)(x);
     }
 
     function getY2Scale() {
@@ -572,6 +567,15 @@ function mainCurve($elem, inputData) {
 			});
 		}		
 		return points;
+	}
+
+	function gaussianDistribution(mu, sigma) {
+		return function (x) {
+			var gaussianConstant = 1 / Math.sqrt(2 * Math.PI);
+
+			x = (x - mu) / sigma;
+			return gaussianConstant * Math.exp(-.5 * x * x) / sigma;
+		};
 	}
 
     var histQ=HISTOGRAMQ;
