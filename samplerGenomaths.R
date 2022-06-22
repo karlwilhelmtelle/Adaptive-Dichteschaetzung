@@ -11,7 +11,7 @@ args <- list(norm = c(mean = 1, sd = 1), norm = c(mean = 5, sd = 1))
 # ------------------------------------------------------------
 
 # ===== Sampling from the specified mixture distribution ====
-x <- rmixtdistr(n = 1e5, phi = phi , arg = args)
+x <- rmixtdistr(n = 1e3, phi = phi , arg = args)
 # ------------------------------------------------------------
 
 # === The graphics for the simulated dataset and the corresponding theoretical
