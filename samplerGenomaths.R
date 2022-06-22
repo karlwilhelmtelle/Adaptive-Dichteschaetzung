@@ -20,3 +20,5 @@ par(bg = "gray98", mar = c(3, 4, 2, 1) )
 hist(x, 90, freq = FALSE, las = 1, family = "serif", col = rgb(0, 0, 1, 0.2), border = "deepskyblue")
 x1 <- seq(-4, 10, by = 0.001)
 lines(x1, dmixtdistr(x1, phi = phi, arg = args), col = "red")
+
+x
