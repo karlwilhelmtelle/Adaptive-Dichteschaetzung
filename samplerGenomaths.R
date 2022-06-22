@@ -21,4 +21,8 @@ hist(x, 90, freq = FALSE, las = 1, family = "serif", col = rgb(0, 0, 1, 0.2), bo
 x1 <- seq(-4, 10, by = 0.001)
 lines(x1, dmixtdistr(x1, phi = phi, arg = args), col = "red")
 
-x
+sink("sample-mixed-normal-distribution.js")
+cat("var SAMPLE_MIXED_NORMAL_DISTRIBUTION = [")
+cat(toString(x))
+cat("]")
+sink()
