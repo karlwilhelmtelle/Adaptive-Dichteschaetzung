@@ -1,4 +1,4 @@
-function mainCurve($elem, inputData) {
+function mainCurve($elem, inputData, maxScaleY) {
     var HISTOGRAMQ = 1; // Default Q
     var DENSQ = HISTOGRAMQ/8; // Smoothing of the density function, in value units
 	if (inputData !== undefined) {
@@ -58,8 +58,8 @@ function mainCurve($elem, inputData) {
 			.attr("class", "line")
 			.attr("d", line);
 	} else {
-		x.domain([d3.min(xData) - 10, d3.max(xData) + 10]);
-		y.domain([0, 0.1]);
+		x.domain([d3.min(xData) - 1, d3.max(xData) + 1]);
+		y.domain([0, maxScaleY]);
 	}
 
     var xAxis = d3.svg.axis()
