@@ -192,7 +192,6 @@ function mainCurve($elem, inputData, maxScaleY) {
 
 		var nrPoints = Math.round(maxPoints / 2);
 		var points = xScale.ticks(nrPoints);
-		console.log(maxPoints, nrPoints);
 
 		var densityData = kernelDensityEstimator(epanechnikovKernel, points)(data);
 		
