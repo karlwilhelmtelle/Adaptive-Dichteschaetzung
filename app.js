@@ -525,8 +525,10 @@ function mainCurve($elem, inputData, maxScaleY) {
 		renderHistogram(svg, histogramData, x, y);
         renderCdf(svg, cdfData, x, y2Scale);
 
-		var RMSE = getRMSE(densityData, groundTruthMixedNormalDistribution);
-		console.log(RMSE);
+		var densityRMSE = getDensityRMSE(densityData, groundTruthMixedNormalDistribution);
+		var histogramRMSE = getHistogramRMSE(histogramData, groundTruthMixedNormalDistribution);
+		console.log("Density RMSE", densityRMSE);
+		console.log("Histogram RMSE", histogramRMSE);
     }
 
     function getHistogram(data, q, logScaleBase) {
@@ -588,7 +590,7 @@ function mainCurve($elem, inputData, maxScaleY) {
 		3/10 * gaussianDistribution(5, 1)(x);
 	}
 
-	function getRMSE(dataPoints, compareFunc) {
+	function getDensityRMSE(dataPoints, compareFunc) {
 		var MSE = 0;
 		dataPoints.forEach(function (point) {
 			var x = point[0];
