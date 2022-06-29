@@ -13,6 +13,7 @@ function mainCurve($elem, inputData, maxScaleY) {
     //setting up empty data array
     var data = [];
     var xData = [];
+	var xDataTicks = [];
     var yData = [];
 
     getData(); // popuate data 
@@ -95,12 +96,12 @@ function mainCurve($elem, inputData, maxScaleY) {
         // probabily - quantile pairs
         for (var i = 0; i < 1e5; i++) {
             q = normal();
-            p = standardNormalDistribution(q) // calc prob of rand draw
+            p = standardNormalDistribution(q); // calc prob of rand draw
             el = {
                 "q": q,
                 "p": p
-            }
-            data.push(el)
+            };
+            data.push(el);
         };
 
 		// need to sort for plotting
@@ -637,7 +638,6 @@ function mainCurve($elem, inputData, maxScaleY) {
     var showCdf = SHOWCDF;
     var showDensity = SHOWDENSITY;
     var densityData = null;
-	var densityTicks = null;
 	var cdfData = null;
     var y2Scale = null;
 
