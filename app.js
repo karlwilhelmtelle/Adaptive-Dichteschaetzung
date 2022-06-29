@@ -47,7 +47,16 @@ function mainCurve($elem, inputData, maxScaleY) {
 		y.domain(d3.extent(data, function(d) {
 			return d.p;
 		}));
-		var line = d3.svg.line()
+	} else {
+		x.domain([d3.min(xData) - 1, d3.max(xData) + 1]);
+		y.domain([0, maxScaleY]);
+
+		var nrPoints = Math.round(width / 2);
+		xDataTicks = x.ticks(nrPoints);
+		createGroundTruthData();
+	}
+
+	var line = d3.svg.line()
 			.x(function(d) {
 				return x(d.q);
 			})
@@ -58,10 +67,6 @@ function mainCurve($elem, inputData, maxScaleY) {
 			.datum(data)
 			.attr("class", "line")
 			.attr("d", line);
-	} else {
-		x.domain([d3.min(xData) - 1, d3.max(xData) + 1]);
-		y.domain([0, maxScaleY]);
-	}
 
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -141,7 +146,7 @@ function mainCurve($elem, inputData, maxScaleY) {
 		return cdfData;
 	}
 
-    function getDensityDistribution(data, q, xScale, maxPoints) {
+    function getDensityDistribution(data, q) {
 
 		function getNumberOfSamplesInArea(x, radius, sample) {
 			var sum = 0;
@@ -191,10 +196,7 @@ function mainCurve($elem, inputData, maxScaleY) {
 			};
 		}
 
-		var nrPoints = Math.round(maxPoints / 2);
-		densityTicks = xScale.ticks(nrPoints);
-
-		var densityData = kernelDensityEstimator(epanechnikovKernel, densityTicks)(data);
+		var densityData = kernelDensityEstimator(epanechnikovKernel, xDataTicks)(data);
 		
 		// Add termination points
 		//densityData.splice(0,0,[0,0]);
@@ -207,7 +209,7 @@ function mainCurve($elem, inputData, maxScaleY) {
         var linScale = x;
         y2Scale = getY2Scale();
 
-        densityData = getDensityDistribution(xData, DENSQ, linScale, width);
+        densityData = getDensityDistribution(xData, DENSQ);
         cdfData = getCdf(xData, CDFQ, linScale, 1, width/2);
     }
 
