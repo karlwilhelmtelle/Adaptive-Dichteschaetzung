@@ -191,9 +191,9 @@ function mainCurve($elem, inputData, maxScaleY) {
 		}
 
 		var nrPoints = Math.round(maxPoints / 2);
-		var points = xScale.ticks(nrPoints);
+		densityTicks = xScale.ticks(nrPoints);
 
-		var densityData = kernelDensityEstimator(epanechnikovKernel, points)(data);
+		var densityData = kernelDensityEstimator(epanechnikovKernel, densityTicks)(data);
 		
 		// Add termination points
 		//densityData.splice(0,0,[0,0]);
@@ -602,6 +602,7 @@ function mainCurve($elem, inputData, maxScaleY) {
     var showCdf = SHOWCDF;
     var showDensity = SHOWDENSITY;
     var densityData = null;
+	var densityTicks = null;
 	var cdfData = null;
     var y2Scale = null;
 
