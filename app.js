@@ -597,6 +597,41 @@ function mainCurve($elem, inputData, maxScaleY) {
 		return Math.sqrt(MSE);
 	}
 
+	function getHistogramRMSE(histogramData, compareFunc) {
+		/*var minX = histogramData[0].x;
+		var lastElement = histogramData[histogramData.length - 1];
+		var maxX = lastElement.x + lastElement.dx;
+		densityTicksInterval = densityTicks.filter(function (tick) {
+			return tick >= minX && tick < maxX;
+		});*/
+		var dataPoints = xDataTicks.map(function (x) {
+			var y = 0;
+			for (var i = 0; i < histogramData.length; i++) {
+				var el = histogramData[i];
+				if (x < el.x) {
+					break;
+				}
+				if (el.x + el.dx > x) {
+					y = el.y / el.dx;
+					break;
+				}
+			}
+			return [x, y];
+		});
+		console.log(dataPoints);
+		return getDensityRMSE(dataPoints, compareFunc);
+	}
+
+	function createGroundTruthData() {
+		xDataTicks.forEach(function (tick) {
+			el = {
+                "q": tick,
+                "p": groundTruthMixedNormalDistribution(tick)
+            };
+            data.push(el);
+		});
+	}
+
     var histQ=HISTOGRAMQ;
     var logScaleBase=1;  // use =LOGSCALEBASE to start as log scale
     var showCdf = SHOWCDF;
