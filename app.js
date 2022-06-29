@@ -523,6 +523,9 @@ function mainCurve($elem, inputData, maxScaleY) {
 		renderDensity(svg, densityData, x, y);
 		renderHistogram(svg, histogramData, x, y);
         renderCdf(svg, cdfData, x, y2Scale);
+
+		var RMSE = getRMSE(densityData, groundTruthMixedNormalDistribution);
+		console.log(RMSE);
     }
 
     function getHistogram(data, q, logScaleBase) {
@@ -577,6 +580,21 @@ function mainCurve($elem, inputData, maxScaleY) {
 			x = (x - mu) / sigma;
 			return gaussianConstant * Math.exp(-.5 * x * x) / sigma;
 		};
+	}
+
+	function groundTruthMixedNormalDistribution(x) {
+		return 7/10 * gaussianDistribution(1, 1)(x) + 
+		3/10 * gaussianDistribution(5, 1)(x);
+	}
+
+	function getRMSE(dataPoints, compareFunc) {
+		var MSE = 0;
+		dataPoints.forEach(function (point) {
+			var x = point[0];
+			var y = point[1];
+			MSE += Math.pow(y - compareFunc(x), 2);
+		});
+		return Math.sqrt(MSE);
 	}
 
     var histQ=HISTOGRAMQ;
