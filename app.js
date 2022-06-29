@@ -196,8 +196,8 @@ function mainCurve($elem, inputData, maxScaleY) {
 		var densityData = kernelDensityEstimator(epanechnikovKernel, points)(data);
 		
 		// Add termination points
-		densityData.splice(0,0,[0,0]);
-		densityData.push([xScale.domain()[1],0]);
+		//densityData.splice(0,0,[0,0]);
+		//densityData.push([xScale.domain()[1],0]);
 		console.log(densityData);
 		return densityData;
 	}
