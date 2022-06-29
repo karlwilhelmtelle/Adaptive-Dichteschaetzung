@@ -83,7 +83,9 @@ function mainCurve($elem, inputData, maxScaleY) {
         if (inputData === undefined) {
 			createGaussianData();
 		} else {
-			inputData.sort();
+			inputData.sort(function (x, y) {
+				return x - y;
+			});
 			xData = inputData;
 		}
     }
