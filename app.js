@@ -528,8 +528,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 
 		var densityRMSE = getDensityRMSE(densityData, groundTruthMixedNormalDistribution);
 		var histogramRMSE = getHistogramRMSE(histogramData, groundTruthMixedNormalDistribution);
-		console.log("Density RMSE", densityRMSE);
-		console.log("Histogram RMSE", histogramRMSE);
+		console.log("Density RMSE", d3.round(densityRMSE, 4));
+		console.log("Histogram RMSE", d3.round(histogramRMSE, 4));
 		console.log("\n");
     }
 
