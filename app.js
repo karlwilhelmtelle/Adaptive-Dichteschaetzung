@@ -179,9 +179,11 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		function kernelDensityEstimator(kernelFunc, x) {
 			return function(sample) {
 				var scaleFromPosition = {};
-				sample.forEach(function (v) {
-					scaleFromPosition[v] = getScaleFromPosition(v, sample);
-				});
+				if (isAdaptive) {
+					sample.forEach(function (v) {
+						scaleFromPosition[v] = getScaleFromPosition(v, sample);
+					});
+				}
 				return x.map(function(x) {
 					var scale = q;
 					return [x, d3.mean(sample, function(v) {
