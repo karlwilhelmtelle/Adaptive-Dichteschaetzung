@@ -1,7 +1,7 @@
-function mainCurve($elem, inputData, maxScaleY) {
-    var HISTOGRAMQ = 1; // Default Q
-    var DENSQ = HISTOGRAMQ/8; // Smoothing of the density function, in value units
-	if (inputData !== undefined) {
+function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
+    var HISTOGRAMQ = 0.4; // Default Q
+    var DENSQ = 0.7; // Smoothing of the density function, in value units
+	if (isAdaptive) {
 		DENSQ = 400;
 	}
     var DENSNORM = 1; // Normalizing value of the densityfunction (0-1)
@@ -181,7 +181,7 @@ function mainCurve($elem, inputData, maxScaleY) {
 				return x.map(function(x) {
 					var scale = q;
 					return [x, d3.mean(sample, function(v) {
-						if (inputData !== undefined) {
+						if (isAdaptive) {
 							scale = getScaleFromPosition(v, sample);
 						}
 						return kernelFunc()((x - v) / scale) / scale; 
@@ -201,7 +201,6 @@ function mainCurve($elem, inputData, maxScaleY) {
 		// Add termination points
 		//densityData.splice(0,0,[0,0]);
 		//densityData.push([xScale.domain()[1],0]);
-		console.log(densityData);
 		return densityData;
 	}
 
@@ -268,7 +267,7 @@ function mainCurve($elem, inputData, maxScaleY) {
 			densCb.attr('checked', 'checked');
 
 		var binWidthSpan = $('<span>');
-		if (inputData === undefined) {
+		if (!isAdaptive) {
 			binWidthSpan = $('<span>').append(
 				$('<label>').append('Bin width:').css('margin-right', 5),
 				binStepper/*,
@@ -504,7 +503,7 @@ function mainCurve($elem, inputData, maxScaleY) {
 		var percentage = d3.round(100 * sqrtN / xData.length, 2);
 		bars.select('title')
 			.text(function(d) {
-				if (inputData === undefined) {
+				if (!isAdaptive) {
 					percentage = d3.round(d.y*100,2);
 				}
 				var barHeight = d.y / d.dx;
@@ -517,7 +516,7 @@ function mainCurve($elem, inputData, maxScaleY) {
 
     function redraw() {
 		var histogramData;
-		if (inputData === undefined) {
+		if (!isAdaptive) {
 			histogramData = getHistogram(xData, histQ, logScaleBase);
 		} else {
 			histogramData = getAdaptiveHistogram(xData);
@@ -531,6 +530,7 @@ function mainCurve($elem, inputData, maxScaleY) {
 		var histogramRMSE = getHistogramRMSE(histogramData, groundTruthMixedNormalDistribution);
 		console.log("Density RMSE", densityRMSE);
 		console.log("Histogram RMSE", histogramRMSE);
+		console.log("\n");
     }
 
     function getHistogram(data, q, logScaleBase) {
@@ -623,7 +623,6 @@ function mainCurve($elem, inputData, maxScaleY) {
 			}
 			return [x, y];
 		});
-		console.log(dataPoints);
 		return getDensityRMSE(dataPoints, compareFunc);
 	}
 

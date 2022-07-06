@@ -39,7 +39,9 @@
         <script src="generalisiertes-additives-modell.js"></script>
         <script src="sample-mixed-normal-distribution.js"></script>
         <script>
-            mainCurve($('body'), SAMPLE_MIXED_NORMAL_DISTRIBUTION, 0.5);
+            var body = $('body');
+            mainCurve(body, SAMPLE_MIXED_NORMAL_DISTRIBUTION, 0.5, true);
+            mainCurve(body, SAMPLE_MIXED_NORMAL_DISTRIBUTION, 0.5, false);
             //mainCurve($('body'), GENERALISIERTES_ADDITIVES_MODELL, 0.1);
             //mainCurve($('body'));
             //sampleDistributionGraph($('body'), VALUES);
