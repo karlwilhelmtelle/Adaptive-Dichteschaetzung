@@ -1,3 +1,5 @@
+install.packages("remotes")
+remotes::install_github("genomaths/usefr")
 library(usefr)
 set.seed(123) # set a seed for random generation
 # ========= A mixture of three distributions =========
