@@ -4,7 +4,6 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	if (isAdaptive) {
 		DENSQ = 400;
 	}
-    var DENSNORM = 1; // Normalizing value of the densityfunction (0-1)
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
     var SHOWCDF = false; // Default value - show cdf function at startup
@@ -165,12 +164,12 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			return sum;
 		}
 
-		function getScaleFromPosition(x, sample) {
-			var samplesInArea = getNumberOfSamplesInArea(x, 1, sample);
+		function getScaleFromPosition(x, radius, sample) {
+			var samplesInArea = getNumberOfSamplesInArea(x, radius, sample);
 			if (samplesInArea == 0) {
-				scale = 2 * q;
+				scale = 200 * q;
 			} else {
-				scale = 0.5 * q / samplesInArea;
+				scale = 2 * q / samplesInArea;
 			}
 			//console.log("x", x, "scale", scale);
 			return scale;
@@ -180,8 +179,9 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			return function(sample) {
 				var scaleFromPosition = {};
 				if (isAdaptive) {
+					var sqrtN = d3.round(Math.sqrt(sample.length));
 					sample.forEach(function (v) {
-						scaleFromPosition[v] = getScaleFromPosition(v, sample);
+						scaleFromPosition[v] = getScaleFromPosition(v, sqrtN, sample);
 					});
 				}
 				return x.map(function(x) {
