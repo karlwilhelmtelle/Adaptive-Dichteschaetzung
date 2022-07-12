@@ -534,8 +534,10 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 
 		var densityRMSE = getDensityRMSE(densityData, groundTruthMixedNormalDistribution);
 		var histogramRMSE = getHistogramRMSE(histogramData, groundTruthMixedNormalDistribution);
+		var densityKLDiv = getKullbackLeiblerDivergence(densityData, groundTruthMixedNormalDistribution);
 		console.log("Density RMSE", d3.round(densityRMSE, 4));
 		console.log("Histogram RMSE", d3.round(histogramRMSE, 4));
+		console.log("Density KL Divergenz", d3.round(densityKLDiv, 4));
 		console.log("\n");
     }
 
@@ -640,6 +642,20 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
             };
             data.push(el);
 		});
+	}
+
+	function getKullbackLeiblerDivergence(estimationFunc, groundTruthFunc) {
+		var sum = 0;
+		estimationFunc.forEach(function (point) {
+			var x = point[0];
+			var y = point[1];
+			var p = groundTruthFunc(x);
+			var q = y;
+			if (p != 0 && q != 0) {
+				sum += p * Math.log2(p / q);
+			}
+		});
+		return sum;
 	}
 
     var histQ=HISTOGRAMQ;
