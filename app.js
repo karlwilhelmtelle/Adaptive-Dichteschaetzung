@@ -1,5 +1,5 @@
 function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
-    var HISTOGRAMQ = 0.4; // Default Q
+    var HISTOGRAMQ = 0.3; // Default Q
     var DENSQ = 0.7; // Smoothing of the density function, in value units
 	if (isAdaptive) {
 		DENSQ = 400;
