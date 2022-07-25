@@ -122,13 +122,19 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	}
 
     function getCdf(data, q, xScale, logScaleBase, maxPoints) {
-
-		var maxQ = Math.max(q, (xScale.domain()[1]-xScale.domain()[0])/maxPoints);
+		var xDomain = xScale.domain();
+		var leftX = xDomain[0];
+		var rightX = xDomain[1];
+		var maxQ = Math.max(q, (rightX - leftX)/maxPoints);
 
 		var binnedData = getHistogram(data, maxQ, logScaleBase);
 
 		if (binnedData.length==0)
 			return [];
+
+		binnedData = binnedData.filter(function (elem) {
+			return elem.x >= leftX && elem.x <= rightX; 
+		});
 
 		var xOffset = binnedData[0].dx/2;
 
@@ -140,8 +146,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		}
 
 		// Add termination points
-		cdfData.splice(0,0,[xScale.domain()[0],0]);
-		cdfData.push([xScale.domain()[1],1]);
+		cdfData.splice(0, 0, [leftX, 0]);
+		cdfData.push([rightX, 1]);
 
 		return cdfData;
 	}
