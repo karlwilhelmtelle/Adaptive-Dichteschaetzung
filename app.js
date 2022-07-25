@@ -216,7 +216,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
         y2Scale = getY2Scale();
 
         densityData = getDensityDistribution(xData, DENSQ);
-        cdfData = getCdf(xData, CDFQ, linScale, 1, width/2);
+		cdfData = getCdf(xData, CDFQ, linScale, 1, width/2);
+		integralData = getIntegralData(densityData);
     }
 
     // from http://bl.ocks.org/mbostock/4349187
@@ -540,6 +541,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		console.log("Histogram RMSE", d3.round(histogramRMSE, 4));
 		console.log("Density KL Divergenz", d3.round(densityKLDiv, 4));
 		console.log("\n");
+
+		getDiffFromDensityIntegralAndCDF(cdfData, integralData);
     }
 
     function getHistogram(data, q, logScaleBase) {
@@ -672,11 +675,52 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		return sum / (n - 1);
 	}
 
+	function getIntegralData(densityData) {
+		var firstX = densityData[0][0];
+		var integralFunc = [[firstX, 0]];
+		for (var i = 1; i < densityData.length; i++) {
+			var point = densityData[i];
+			var x = point[0];
+			var y = point[1];
+			var integralBefore = integralFunc[i - 1];
+			var xIntegralBefore = integralBefore[0];
+			var yIntegralBefore = integralBefore[1];
+			var dx = x - xIntegralBefore;
+			var integralNew = yIntegralBefore + y * dx;
+			integralFunc[i] = [x, integralNew];
+		}
+		return integralFunc;
+	}
+
+	function getDiffFromDensityIntegralAndCDF(cdfData, integralData) {
+		var diff = 0;
+		var j = 0;
+		for (var i = 1; i < integralData.length - 1; i++) {
+			var integralPoint = integralData[i];
+			var integralPointX = integralPoint[0];
+			var integralPointY = integralPoint[1];
+			var integralPointDX = integralData[i + 1][0] - integralPointX;
+			for (; j < cdfData.length - 1; j++) {
+				var cdfNextPoint = cdfData[j + 1];
+				var cdfNextPointX = cdfNextPoint[0];
+				if (cdfNextPointX > integralPointX) {
+					break;
+				}
+			}
+			var cdfPoint = cdfData[j];
+			var cdfPointY = cdfPoint[1];
+			diff += (cdfPointY - integralPointY) * integralPointDX;
+		}
+		console.log(diff);
+		return Math.abs(diff);
+	}
+
     var histQ=HISTOGRAMQ;
     var logScaleBase=1;  // use =LOGSCALEBASE to start as log scale
     var showCdf = SHOWCDF;
     var showDensity = SHOWDENSITY;
-    var densityData = null;
+	var densityData = null;
+	var integralData;
 	var cdfData = null;
     var y2Scale = null;
 
