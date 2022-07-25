@@ -92,6 +92,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 				return x - y;
 			});
 			xData = inputData;
+			//console.log("sigma hat squared", getSigmaHatSquared(xData));
 		}
     }
 
@@ -656,6 +657,15 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			}
 		});
 		return sum;
+	}
+
+	function getSigmaHatSquared(sample) {
+		var mean = d3.mean(sample);
+		var sum = d3.sum(sample, function(x) {
+			return Math.pow(x - mean, 2);
+		});
+		var n = sample.length;
+		return sum / (n - 1);
 	}
 
     var histQ=HISTOGRAMQ;
