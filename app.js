@@ -647,15 +647,19 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 
 	function getKullbackLeiblerDivergence(estimationFunc, groundTruthFunc) {
 		var sum = 0;
-		estimationFunc.forEach(function (point) {
+		for (var i = 0; i < estimationFunc.length - 1; i++) {
+			var point = estimationFunc[i];
 			var x = point[0];
 			var y = point[1];
 			var p = groundTruthFunc(x);
 			var q = y;
 			if (p != 0 && q != 0) {
-				sum += p * Math.log2(p / q);
+				var nextPoint = estimationFunc[i + 1];
+				var nextPointX = nextPoint[0];
+				var dx = nextPointX - x;
+				sum += p * Math.log2(p / q) * dx;
 			}
-		});
+		}
 		return sum;
 	}
 
