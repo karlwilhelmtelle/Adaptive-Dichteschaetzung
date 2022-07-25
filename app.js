@@ -179,7 +179,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			return function(sample) {
 				var scaleFromPosition = {};
 				if (isAdaptive) {
-					var sqrtN = d3.round(Math.sqrt(sample.length));
+					var sqrtN = Math.sqrt(sample.length);
 					sample.forEach(function (v) {
 						scaleFromPosition[v] = getScaleFromPosition(v, sqrtN, sample);
 					});
