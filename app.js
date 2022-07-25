@@ -305,7 +305,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			//scaleRadio,
 			$('<label>').append(densCb, ' Show density')
 				.css({'cursor': 'pointer', 'margin-left': 25}),
-			$('<label>').append(cdfCb, ' Show cdf')
+			$('<label>').append(cdfCb, ' Show cdf and density integral')
 				.css({'cursor': 'pointer', 'margin-left': 15})
 		]).css({
 			'text-align': 'center',
@@ -323,9 +323,9 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			})
 		});
         */
-		cdfCb.change( function() {
+		cdfCb.change(function () {
 			showCdf=this.checked;
-			renderCdf(svg, cdfData, x, y2Scale);
+			renderCdf(svg, cdfData, integralData, x, y2Scale);
 			svg.select('.y2-axis')
 				.transition().duration(TRANSITION_DUR)
 				.style('opacity', (showCdf?1:0));
@@ -350,12 +350,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			.range([height, 0]);
 	}
 
-    function renderCdf(svg, data, xScale, yScale) {
-
-		var dataFilter = function(d) {
-			return (d[0] >= xScale.domain()[0] && d[0]<=xScale.domain()[1]);
-		};
-
+    function renderCdf(svg, cdfData, integralData, xScale, yScale) {
 		// CDF line
 		var line = d3.svg.line()
 			.x(function(d) { return xScale(d[0]); })
@@ -363,8 +358,21 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			.interpolate("basis");
 
 		var lines = svg.selectAll('.cdf-line')
-			.data([(showCdf?data:[])]);
+			.data([(showCdf?cdfData:[])]);
 
+		var linesIntegral = svg.selectAll('.integral-line')
+			.data([(showCdf?integralData:[])]);
+
+		linesIntegral.enter()
+			.append("path")
+			.attr("class", "integral-line")
+			.style({
+				"fill": "none",
+				"stroke": "black",
+				"stroke-opacity": .4,
+				"stroke-width": "2px"
+			});
+		
 		lines.enter()
 			.append("path")
 			.attr("class", "cdf-line")
@@ -403,14 +411,13 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		lines
 		  .transition().duration(TRANSITION_DUR)
 			.attr("d", line);
+		
+		linesIntegral
+			.transition().duration(TRANSITION_DUR)
+			.attr("d", line);
 	}
 
     function renderDensity(svg, data, xScale, yScale) {
-
-		var dataFilter = function(d) {
-			return (d[0] >= xScale.domain()[0] && d[0]<=xScale.domain()[1]);
-		};
-
 		var thisData = showDensity?data.slice(0):[];
 
 		// Add termination points
@@ -441,10 +448,6 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	}
 
     function renderHistogram(svg, data, xScale, yScale) {
-		var dataFilter = function(d) {
-			return (d.x >= xScale.domain()[0] && (d.x+d.dx)<=xScale.domain()[1]);
-		};
-
 		var bars = svg.selectAll(".histo-bar")
 			.data(data);
 
@@ -538,17 +541,21 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 
 		renderDensity(svg, densityData, x, y);
 		renderHistogram(svg, histogramData, x, y);
-        renderCdf(svg, cdfData, x, y2Scale);
+		renderCdf(svg, cdfData, integralData, x, y2Scale);
 
 		var densityRMSE = getDensityRMSE(densityData, groundTruthMixedNormalDistribution);
 		var histogramRMSE = getHistogramRMSE(histogramData, groundTruthMixedNormalDistribution);
 		var densityKLDiv = getKullbackLeiblerDivergence(densityData, groundTruthMixedNormalDistribution);
+		var cdfIntegralDiff = 
+			getDiffFromDensityIntegralAndCDF(cdfData, integralData);
 		console.log("Density RMSE", d3.round(densityRMSE, 4));
 		console.log("Histogram RMSE", d3.round(histogramRMSE, 4));
 		console.log("Density KL Divergenz", d3.round(densityKLDiv, 4));
+		console.log("Diff between density integral and CDF", 
+			d3.round(cdfIntegralDiff, 6));
 		console.log("\n");
 
-		getDiffFromDensityIntegralAndCDF(cdfData, integralData);
+		
     }
 
     function getHistogram(data, q, logScaleBase) {
@@ -701,8 +708,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	function getDiffFromDensityIntegralAndCDF(cdfData, integralData) {
 		var diff = 0;
 		var j = 0;
-		console.log("cdfData", cdfData);
-		console.log("integralData", integralData);
+		//console.log("cdfData", cdfData);
+		//console.log("integralData", integralData);
 		for (var i = 1; i < integralData.length - 1; i++) {
 			var integralPoint = integralData[i];
 			var integralPointX = integralPoint[0];
@@ -715,12 +722,11 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 					break;
 				}
 			}
-			console.log("j", j);
+			//console.log("j", j);
 			var cdfPoint = cdfData[j];
 			var cdfPointY = cdfPoint[1];
 			diff += (cdfPointY - integralPointY) * integralPointDX;
 		}
-		console.log(diff);
 		return Math.abs(diff);
 	}
 
