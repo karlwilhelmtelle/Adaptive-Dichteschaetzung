@@ -695,6 +695,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	function getDiffFromDensityIntegralAndCDF(cdfData, integralData) {
 		var diff = 0;
 		var j = 0;
+		console.log("cdfData", cdfData);
+		console.log("integralData", integralData);
 		for (var i = 1; i < integralData.length - 1; i++) {
 			var integralPoint = integralData[i];
 			var integralPointX = integralPoint[0];
@@ -707,6 +709,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 					break;
 				}
 			}
+			console.log("j", j);
 			var cdfPoint = cdfData[j];
 			var cdfPointY = cdfPoint[1];
 			diff += (cdfPointY - integralPointY) * integralPointDX;
