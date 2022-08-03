@@ -41,10 +41,10 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 
 	if (inputData === undefined) {
 		x.domain(d3.extent(data, function(d) {
-			return d.q;
+			return d[0];
 		}));
 		y.domain(d3.extent(data, function(d) {
-			return d.p;
+			return d[1];
 		}));
 	} else {
 		x.domain([d3.min(xData) - 1, d3.max(xData) + 1]);
@@ -57,10 +57,10 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 
 	var line = d3.svg.line()
 			.x(function(d) {
-				return x(d.q);
+				return x(d[0]);
 			})
 			.y(function(d) {
-				return y(d.p);
+				return y(d[1]);
 			});
 		svg.append("path")
 			.datum(data)
@@ -100,24 +100,21 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		// loop to populate data array with 
         // probabily - quantile pairs
         for (var i = 0; i < 1e5; i++) {
-            q = normal();
-            p = standardNormalDistribution(q); // calc prob of rand draw
-            el = {
-                "q": q,
-                "p": p
-            };
+            var x = normal();
+            var y = standardNormalDistribution(x); // calc prob of rand draw
+            var el = [x, y];
             data.push(el);
         };
 
 		// need to sort for plotting
         //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-        data.sort(function(x, y) {
-            return x.q - y.q;
+        data.sort(function(a, b) {
+            return a[0] - b[0];
         });
 
         data.forEach(function (el) {
-            xData.push(el.q);
-            yData.push(el.p);
+            xData.push(el[0]);
+            yData.push(el[1]);
         });
 	}
 
@@ -653,10 +650,9 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 
 	function createGroundTruthData() {
 		xDataTicks.forEach(function (tick) {
-			el = {
-                "q": tick,
-                "p": groundTruthMixedNormalDistribution(tick)
-            };
+			var x = tick;
+			var y = groundTruthMixedNormalDistribution(tick);
+			var el = [x, y];
             data.push(el);
 		});
 	}
