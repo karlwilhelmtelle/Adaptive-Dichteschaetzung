@@ -93,12 +93,12 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			});
 			xData = inputData;
 			var n = xData.length;
-			console.log("n", n);
+			csvLog("n", n);
 			var sigmaHat = getSigmaHat(xData);
-			console.log("sigma hat", d3.round(sigmaHat, 2));
+			csvLog("sigma hat", d3.round(sigmaHat, 3));
 			var recommendedBandwidth = Math.pow(
 				4*Math.pow(sigmaHat, 5)/(3*n), 1/5);
-			console.log("h", d3.round(recommendedBandwidth, 2));
+			csvLog("h", d3.round(recommendedBandwidth, 3));
 		}
     }
 
@@ -181,7 +181,6 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			} else {
 				scale = 2 * q / samplesInArea;
 			}
-			//console.log("x", x, "scale", scale);
 			return scale;
 		}
 
@@ -551,10 +550,11 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		var densityKLDiv = getKullbackLeiblerDivergence(densityData, groundTruthMixedNormalDistribution);
 		var cdfIntegralDiff = 
 			getDiffFromDensityIntegralAndCDF(cdfData, integralData);
-		console.log("Density RMSE", d3.round(densityRMSE, 4));
-		console.log("Histogram RMSE", d3.round(histogramRMSE, 4));
-		console.log("Density KL Divergenz", d3.round(densityKLDiv, 4));
-		console.log("Diff between density integral and CDF", 
+
+		csvLog("Density RMSE", d3.round(densityRMSE, 4));
+		csvLog("Histogram RMSE", d3.round(histogramRMSE, 4));
+		csvLog("Density KL Divergenz", d3.round(densityKLDiv, 4));
+		csvLog("Diff between density integral and CDF", 
 			d3.round(cdfIntegralDiff, 6));
 		console.log("\n");
 
@@ -710,8 +710,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	function getDiffFromDensityIntegralAndCDF(cdfData, integralData) {
 		var diff = 0;
 		var j = 0;
-		//console.log("cdfData", cdfData);
-		//console.log("integralData", integralData);
+		//csvLog("cdfData", cdfData);
+		//csvLog("integralData", integralData);
 		for (var i = 1; i < integralData.length - 1; i++) {
 			var integralPoint = integralData[i];
 			var integralPointX = integralPoint[0];
@@ -724,7 +724,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 					break;
 				}
 			}
-			//console.log("j", j);
+			//csvLog("j", j);
 			var cdfPoint = cdfData[j];
 			var cdfPointY = cdfPoint[1];
 			diff += (cdfPointY - integralPointY) * integralPointDX;

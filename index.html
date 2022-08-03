@@ -38,15 +38,28 @@
         <script src="app.js"></script>
         <script src="generalisiertes-additives-modell.js"></script>
         <script src="sample-mixed-normal-distribution.js"></script>
+        <script src="csv-file.js"></script>
         <script>
             var body = $('body');
-            console.log("nicht-adaptiv");
+            var csvHeader = [];
+            var csvData = [];
+            var csvDataPart = [];
+            var csvDelimiter = ';';
+            var csvFileName = 'console-data';
+            csvLog("adaptiv?", "nicht-adaptiv");
             mainCurve(body, SAMPLE_MIXED_NORMAL_DISTRIBUTION, 0.5, false);
-            console.log("adaptiv");
+            csvData.push(csvDataPart);
+            csvHeader = [];
+            csvDataPart = [];
+            csvLog("adaptiv?", "adaptiv");
             mainCurve(body, SAMPLE_MIXED_NORMAL_DISTRIBUTION, 0.5, true);
+            csvData.push(csvDataPart);
             //mainCurve($('body'), GENERALISIERTES_ADDITIVES_MODELL, 0.1);
             //mainCurve($('body'));
             //sampleDistributionGraph($('body'), VALUES);
+
+            export_csv(csvHeader, csvData, csvDelimiter, csvFileName);
         </script>
+        
     </body>
 </html>
