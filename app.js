@@ -95,10 +95,10 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			var n = xData.length;
 			csvLog("n", n);
 			var sigmaHat = getSigmaHat(xData);
-			csvLog("sigma hat", d3.round(sigmaHat, 3));
+			csvLog("sigma hat", d3.round(sigmaHat, 2));
 			var recommendedBandwidth = Math.pow(
 				4*Math.pow(sigmaHat, 5)/(3*n), 1/5);
-			csvLog("h", d3.round(recommendedBandwidth, 3));
+			csvLog("h", d3.round(recommendedBandwidth, 2));
 		}
     }
 
