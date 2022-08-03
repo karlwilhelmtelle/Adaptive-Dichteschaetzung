@@ -40,7 +40,9 @@
         <script src="sample-mixed-normal-distribution.js"></script>
         <script>
             var body = $('body');
+            console.log("nicht-adaptiv");
             mainCurve(body, SAMPLE_MIXED_NORMAL_DISTRIBUTION, 0.5, false);
+            console.log("adaptiv");
             mainCurve(body, SAMPLE_MIXED_NORMAL_DISTRIBUTION, 0.5, true);
             //mainCurve($('body'), GENERALISIERTES_ADDITIVES_MODELL, 0.1);
             //mainCurve($('body'));

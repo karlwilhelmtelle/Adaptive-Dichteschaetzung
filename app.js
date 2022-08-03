@@ -92,7 +92,13 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 				return x - y;
 			});
 			xData = inputData;
-			//console.log("sigma hat squared", getSigmaHatSquared(xData));
+			var n = xData.length;
+			console.log("n", n);
+			var sigmaHat = getSigmaHat(xData);
+			console.log("sigma hat", d3.round(sigmaHat, 2));
+			var recommendedBandwidth = Math.pow(
+				4*Math.pow(sigmaHat, 5)/(3*n), 1/5);
+			console.log("h", d3.round(recommendedBandwidth, 2));
 		}
     }
 
@@ -675,13 +681,13 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		return sum;
 	}
 
-	function getSigmaHatSquared(sample) {
+	function getSigmaHat(sample) {
 		var mean = d3.mean(sample);
 		var sum = d3.sum(sample, function(x) {
 			return Math.pow(x - mean, 2);
 		});
 		var n = sample.length;
-		return sum / (n - 1);
+		return Math.sqrt(sum / (n - 1));
 	}
 
 	function getIntegralData(densityData) {
