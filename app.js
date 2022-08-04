@@ -1,8 +1,8 @@
 function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
     var HISTOGRAMQ = 0.3; // Default Q
-    var DENSQ = 0.84; // Smoothing of the density function, in value units
+    var DENSQ = 0.55; // Smoothing of the density function, in value units
 	if (isAdaptive) {
-		DENSQ = 40;
+		DENSQ = 400;
 	}
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
@@ -99,6 +99,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			var recommendedBandwidth = Math.pow(
 				4*Math.pow(sigmaHat, 5)/(3*n), 1/5);
 			csvLog("h", d3.round(recommendedBandwidth, 2));
+			csvLog("actual h", d3.round(DENSQ, 2));
 		}
     }
 

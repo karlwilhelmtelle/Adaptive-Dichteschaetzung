@@ -4,7 +4,7 @@ library(usefr)
 # 123, 1, 12, 1234, 1e6, 2e6, 3e6, 4e6, 2, 3
 set.seed(123) # set a seed for random generation
 # ========= A mixture of three distributions =========
-nn <- 1e2
+nn <- 1e3
 phi = c(7/10, 3/10) # Mixture proportions
 
 
