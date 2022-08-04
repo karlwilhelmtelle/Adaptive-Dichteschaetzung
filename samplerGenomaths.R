@@ -1,8 +1,10 @@
-install.packages("remotes")
-remotes::install_github("genomaths/usefr")
+#install.packages("remotes")
+#remotes::install_github("genomaths/usefr")
 library(usefr)
+# 123, 1, 12, 1234, 1e6, 2e6, 3e6, 4e6, 2, 3
 set.seed(123) # set a seed for random generation
 # ========= A mixture of three distributions =========
+nn <- 1e2
 phi = c(7/10, 3/10) # Mixture proportions
 
 
@@ -13,7 +15,7 @@ args <- list(norm = c(mean = 1, sd = 1), norm = c(mean = 5, sd = 1))
 # ------------------------------------------------------------
 
 # ===== Sampling from the specified mixture distribution ====
-x <- rmixtdistr(n = 1e3, phi = phi , arg = args)
+x <- rmixtdistr(n = nn, phi = phi , arg = args)
 # ------------------------------------------------------------
 
 # === The graphics for the simulated dataset and the corresponding theoretical

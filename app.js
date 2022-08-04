@@ -1,8 +1,8 @@
 function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
     var HISTOGRAMQ = 0.3; // Default Q
-    var DENSQ = 0.55; // Smoothing of the density function, in value units
+    var DENSQ = 0.84; // Smoothing of the density function, in value units
 	if (isAdaptive) {
-		DENSQ = 400;
+		DENSQ = 40;
 	}
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
@@ -15,7 +15,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	var xDataTicks = [];
     var yData = [];
 
-    getData(); // popuate data 
+    getData(); // populate data 
 
     // line chart based on http://bl.ocks.org/mbostock/3883245
     var margin = {
