@@ -548,8 +548,9 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		var densityRMSE = getDensityRMSE(densityData, groundTruthMixedNormalDistribution);
 		var histogramRMSE = getHistogramRMSE(histogramData, groundTruthMixedNormalDistribution);
 		var densityKLDiv = getKullbackLeiblerDivergence(densityData, groundTruthMixedNormalDistribution);
+		var groundTruthIntegral = getIntegralData(data);
 		var cdfIntegralDiff = 
-			getDiffFromDensityIntegralAndCDF(cdfData, integralData);
+			getDiffFromDensityIntegralAndCDF(groundTruthIntegral, integralData);
 
 		csvLog("Density RMSE", d3.round(densityRMSE, 4));
 		csvLog("Histogram RMSE", d3.round(histogramRMSE, 4));
