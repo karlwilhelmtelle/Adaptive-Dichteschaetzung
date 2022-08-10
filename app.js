@@ -565,10 +565,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		csvLog("Density KL Divergenz", d3.round(densityKLDiv, 4));
 		csvLog("Histogram KL Divergenz", d3.round(histogramKLDiv, 4));
 		csvLog("Diff between density integral and CDF", 
-			d3.round(cdfIntegralDiff, 6));
-		console.log("\n");
-
-		
+			d3.round(cdfIntegralDiff, 6));		
     }
 
     function getHistogram(data, q, logScaleBase) {

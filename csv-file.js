@@ -21,8 +21,45 @@ function export_csv(arrayHeader, arrayData, delimiter, fileName) {
     hiddenElement.click();
 }
 
+var improvedCount = [];
+var firstDataIndex = 4;
+
 function csvLog(key, value) {
+    if (key in csvDataObject) {
+        csvDataObject[key].push(value);
+    } else {
+        csvDataObject[key] = [value];
+    }
     csvHeader.push(key);
     csvDataPart.push(value);
-    console.log(key, value);
+}
+
+function logCsvDataObject(csvDataObject) {
+    for (var i = 0; i < csvHeader.length; i++) {
+        var key = csvHeader[i];
+        if (key in csvDataObject) {
+            var values = csvDataObject[key];
+            var arrow = "";
+            if (i >= firstDataIndex && (typeof values[0]) == "number") {
+                if (values[0] < values[1]) {
+                    arrow = "↑"
+                } else {
+                    arrow = "↓";
+                    if (typeof improvedCount[i] === 'undefined') {
+                        improvedCount[i] = 0;
+                    }
+                    improvedCount[i]++;
+                }
+            }
+            console.log(key, values[0], values[1], arrow);
+        }
+    }
+    console.log("\n");
+}
+
+function logImprovedCount() {
+    for (var i = firstDataIndex; i < csvHeader.length; i++) {
+        var key = csvHeader[i];
+        console.log(key + " improved", improvedCount[i] || 0, "times");
+    }
 }

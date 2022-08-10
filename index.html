@@ -8,6 +8,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.1.3/bootstrap-slider.min.js"></script>
         <script src="values.js"></script>
         <script src="density-old.js"></script>
+        <meta charset="UTF-8"> 
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.1.3/css/bootstrap-slider.min.css">
@@ -45,6 +46,7 @@
             var csvDelimiter = ';';
             var csvData = [];
             for (var i = 0; i < SAMPLE_MIXED_NORMAL_DISTRIBUTION.length; i++) {
+                var csvDataObject = {};
                 var data = SAMPLE_MIXED_NORMAL_DISTRIBUTION[i];
                 var csvHeader = [];
                 var csvDataPart = [];
@@ -59,8 +61,11 @@
                 //mainCurve($('body'), GENERALISIERTES_ADDITIVES_MODELL, 0.1);
                 //mainCurve($('body'));
                 //sampleDistributionGraph($('body'), VALUES);
+
+                logCsvDataObject(csvDataObject);
             }
             
+            logImprovedCount();
 
             export_csv(csvHeader, csvData, csvDelimiter, csvFileName);
         </script>
