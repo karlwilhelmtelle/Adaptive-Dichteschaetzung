@@ -41,22 +41,26 @@
         <script src="csv-file.js"></script>
         <script>
             var body = $('body');
-            var csvHeader = [];
-            var csvData = [];
-            var csvDataPart = [];
-            var csvDelimiter = ';';
             var csvFileName = 'console-data';
-            csvLog("adaptiv?", "nicht-adaptiv");
-            mainCurve(body, SAMPLE_MIXED_NORMAL_DISTRIBUTION, 0.5, false);
-            csvData.push(csvDataPart);
-            csvHeader = [];
-            csvDataPart = [];
-            csvLog("adaptiv?", "adaptiv");
-            mainCurve(body, SAMPLE_MIXED_NORMAL_DISTRIBUTION, 0.5, true);
-            csvData.push(csvDataPart);
-            //mainCurve($('body'), GENERALISIERTES_ADDITIVES_MODELL, 0.1);
-            //mainCurve($('body'));
-            //sampleDistributionGraph($('body'), VALUES);
+            var csvDelimiter = ';';
+            var csvData = [];
+            for (var i = 0; i < SAMPLE_MIXED_NORMAL_DISTRIBUTION.length; i++) {
+                var data = SAMPLE_MIXED_NORMAL_DISTRIBUTION[i];
+                var csvHeader = [];
+                var csvDataPart = [];
+                csvLog("adaptiv?", "nicht-adaptiv");
+                mainCurve(body, data, 0.5, false);
+                csvData.push(csvDataPart);
+                csvHeader = [];
+                csvDataPart = [];
+                csvLog("adaptiv?", "adaptiv");
+                mainCurve(body, data, 0.5, true);
+                csvData.push(csvDataPart);
+                //mainCurve($('body'), GENERALISIERTES_ADDITIVES_MODELL, 0.1);
+                //mainCurve($('body'));
+                //sampleDistributionGraph($('body'), VALUES);
+            }
+            
 
             export_csv(csvHeader, csvData, csvDelimiter, csvFileName);
         </script>
