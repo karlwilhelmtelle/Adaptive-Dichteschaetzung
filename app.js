@@ -98,8 +98,11 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			csvLog("sigma hat", d3.round(sigmaHat, 2));
 			var recommendedBandwidth = Math.pow(
 				4*Math.pow(sigmaHat, 5)/(3*n), 1/5);
-			csvLog("h", d3.round(recommendedBandwidth, 2));
-			csvLog("actual h", d3.round(DENSQ, 2));
+			if (isAdaptive) {
+				recommendedBandwidth = n / 2 * recommendedBandwidth;
+			}
+			DENSQ = recommendedBandwidth;
+			csvLog("h", d3.round(DENSQ, 2));
 		}
     }
 
