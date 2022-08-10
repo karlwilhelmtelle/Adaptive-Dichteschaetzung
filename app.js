@@ -713,24 +713,28 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		return integralFunc;
 	}
 
+	// find first index, where index + 1 (next) has greater x
+	function findIndexInCdf(startIndex, cdfData, x) {
+		for (; startIndex < cdfData.length - 1; startIndex++) {
+			var cdfNextPoint = cdfData[startIndex + 1];
+			var cdfNextPointX = cdfNextPoint[0];
+			if (cdfNextPointX > x) {
+				break;
+			}
+		}
+		return startIndex;
+	}
+
 	function getDiffFromDensityIntegralAndCDF(cdfData, integralData) {
 		var diff = 0;
 		var j = 0;
-		//csvLog("cdfData", cdfData);
-		//csvLog("integralData", integralData);
+
 		for (var i = 1; i < integralData.length - 1; i++) {
 			var integralPoint = integralData[i];
 			var integralPointX = integralPoint[0];
 			var integralPointY = integralPoint[1];
 			var integralPointDX = integralData[i + 1][0] - integralPointX;
-			for (; j < cdfData.length - 1; j++) {
-				var cdfNextPoint = cdfData[j + 1];
-				var cdfNextPointX = cdfNextPoint[0];
-				if (cdfNextPointX > integralPointX) {
-					break;
-				}
-			}
-			//csvLog("j", j);
+			j = findIndexInCdf(j, cdfData, integralPointX);
 			var cdfPoint = cdfData[j];
 			var cdfPointY = cdfPoint[1];
 			diff += (cdfPointY - integralPointY) * integralPointDX;
