@@ -183,7 +183,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			if (samplesInArea == 0) {
 				scale = 200 * q;
 			} else {
-				scale = 2 * q / samplesInArea;
+				scale = 2.5 * q / samplesInArea;
 			}
 			return scale;
 		}
