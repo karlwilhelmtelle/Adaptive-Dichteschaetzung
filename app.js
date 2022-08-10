@@ -549,17 +549,21 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		renderDensity(svg, densityData, x, y);
 		renderHistogram(svg, histogramData, x, y);
 		renderCdf(svg, cdfData, integralData, x, y2Scale);
-
-		var densityRMSE = getDensityRMSE(densityData, groundTruthMixedNormalDistribution);
-		var histogramRMSE = getHistogramRMSE(histogramData, groundTruthMixedNormalDistribution);
-		var densityKLDiv = getKullbackLeiblerDivergence(densityData, groundTruthMixedNormalDistribution);
+		var groundTruth = groundTruthMixedNormalDistribution;
+		var histogramFunction = getHistogramFunction(histogramData);
+		var densityRMSE = getRMSE(densityData, groundTruth);
+		var histogramRMSE = getRMSE(histogramFunction, groundTruth);
+		var densityKLDiv = getKLDivergence(densityData, groundTruth);
+		var histogramKLDiv = getKLDivergence(histogramFunction, groundTruth);
 		var groundTruthIntegral = getIntegralData(data);
+		var histogramIntegral = getIntegralData(histogramFunction);
 		var cdfIntegralDiff = 
 			getDiffFromDensityIntegralAndCDF(groundTruthIntegral, integralData);
 
 		csvLog("Density RMSE", d3.round(densityRMSE, 4));
 		csvLog("Histogram RMSE", d3.round(histogramRMSE, 4));
 		csvLog("Density KL Divergenz", d3.round(densityKLDiv, 4));
+		csvLog("Histogram KL Divergenz", d3.round(histogramKLDiv, 4));
 		csvLog("Diff between density integral and CDF", 
 			d3.round(cdfIntegralDiff, 6));
 		console.log("\n");
@@ -626,7 +630,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		3/10 * gaussianDistribution(5, 1)(x);
 	}
 
-	function getDensityRMSE(dataPoints, compareFunc) {
+	function getRMSE(dataPoints, compareFunc) {
 		var MSE = 0;
 		dataPoints.forEach(function (point) {
 			var x = point[0];
@@ -636,28 +640,26 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		return Math.sqrt(MSE);
 	}
 
-	function getHistogramRMSE(histogramData, compareFunc) {
-		/*var minX = histogramData[0].x;
-		var lastElement = histogramData[histogramData.length - 1];
-		var maxX = lastElement.x + lastElement.dx;
-		densityTicksInterval = densityTicks.filter(function (tick) {
-			return tick >= minX && tick < maxX;
-		});*/
-		var dataPoints = xDataTicks.map(function (x) {
-			var y = 0;
-			for (var i = 0; i < histogramData.length; i++) {
-				var el = histogramData[i];
-				if (x < el.x) {
-					break;
-				}
-				if (el.x + el.dx > x) {
-					y = el.y / el.dx;
-					break;
-				}
+	function getHistogramValue(x, histogramData) {
+		var y = 0;
+		for (var i = 0; i < histogramData.length; i++) {
+			var el = histogramData[i];
+			if (x < el.x) {
+				break;
 			}
+			if (el.x + el.dx > x) {
+				y = el.y / el.dx;
+				break;
+			}
+		}
+		return y;
+	}
+
+	function getHistogramFunction(histogramData) {
+		return xDataTicks.map(function (x) {
+			var y = getHistogramValue(x, histogramData);
 			return [x, y];
 		});
-		return getDensityRMSE(dataPoints, compareFunc);
 	}
 
 	function createGroundTruthData() {
@@ -669,7 +671,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		});
 	}
 
-	function getKullbackLeiblerDivergence(estimationFunc, groundTruthFunc) {
+	function getKLDivergence(estimationFunc, groundTruthFunc) {
 		var sum = 0;
 		for (var i = 0; i < estimationFunc.length - 1; i++) {
 			var point = estimationFunc[i];
@@ -696,11 +698,11 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		return Math.sqrt(sum / (n - 1));
 	}
 
-	function getIntegralData(densityData) {
-		var firstX = densityData[0][0];
+	function getIntegralData(functionData) {
+		var firstX = functionData[0][0];
 		var integralFunc = [[firstX, 0]];
-		for (var i = 1; i < densityData.length; i++) {
-			var point = densityData[i];
+		for (var i = 1; i < functionData.length; i++) {
+			var point = functionData[i];
 			var x = point[0];
 			var y = point[1];
 			var integralBefore = integralFunc[i - 1];
