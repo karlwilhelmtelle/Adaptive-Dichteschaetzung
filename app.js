@@ -558,14 +558,18 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		var groundTruthIntegral = getIntegralData(data);
 		var histogramIntegral = getIntegralData(histogramFunction);
 		var cdfIntegralDiff = 
-			getDiffFromDensityIntegralAndCDF(groundTruthIntegral, integralData);
+			getDiffFromGroundTruthIntegral(groundTruthIntegral, integralData);
+		var histogramIntegralDiff =
+			getDiffFromGroundTruthIntegral(groundTruthIntegral, histogramIntegral);
 
 		csvLog("Density RMSE", d3.round(densityRMSE, 4));
-		csvLog("Histogram RMSE", d3.round(histogramRMSE, 4));
 		csvLog("Density KL Divergenz", d3.round(densityKLDiv, 4));
+		csvLog("Diff between density integral and ground truth", 
+			d3.round(cdfIntegralDiff, 6));
+		csvLog("Histogram RMSE", d3.round(histogramRMSE, 4));
 		csvLog("Histogram KL Divergenz", d3.round(histogramKLDiv, 4));
-		csvLog("Diff between density integral and CDF", 
-			d3.round(cdfIntegralDiff, 6));		
+		csvLog("Diff between histogram integral and ground truth",
+			d3.round(histogramIntegralDiff, 6))	
     }
 
     function getHistogram(data, q, logScaleBase) {
@@ -713,7 +717,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	}
 
 	// find first index, where index + 1 (next) has greater x
-	function findIndexInCdf(startIndex, cdfData, x) {
+	function findLastIndexThatIsSmaller(startIndex, cdfData, x) {
 		for (; startIndex < cdfData.length - 1; startIndex++) {
 			var cdfNextPoint = cdfData[startIndex + 1];
 			var cdfNextPointX = cdfNextPoint[0];
@@ -724,7 +728,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		return startIndex;
 	}
 
-	function getDiffFromDensityIntegralAndCDF(cdfData, integralData) {
+	function getDiffFromGroundTruthIntegral(groundTruthIntegral, integralData) {
 		var diff = 0;
 		var j = 0;
 
@@ -733,10 +737,11 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			var integralPointX = integralPoint[0];
 			var integralPointY = integralPoint[1];
 			var integralPointDX = integralData[i + 1][0] - integralPointX;
-			j = findIndexInCdf(j, cdfData, integralPointX);
-			var cdfPoint = cdfData[j];
-			var cdfPointY = cdfPoint[1];
-			diff += (cdfPointY - integralPointY) * integralPointDX;
+			j = findLastIndexThatIsSmaller(j, groundTruthIntegral, integralPointX);
+			
+			var groundTruthPoint = groundTruthIntegral[j];
+			var groundTruthY = groundTruthPoint[1];
+			diff += (groundTruthY - integralPointY) * integralPointDX;
 		}
 		return Math.abs(diff);
 	}
