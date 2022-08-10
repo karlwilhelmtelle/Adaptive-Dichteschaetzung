@@ -4,6 +4,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	if (isAdaptive) {
 		DENSQ = 400;
 	}
+	var ROOT_TYPE = 2;
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
     var SHOWCDF = false; // Default value - show cdf function at startup
@@ -192,9 +193,9 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			return function(sample) {
 				var scaleFromPosition = {};
 				if (isAdaptive) {
-					var sqrtN = Math.sqrt(sample.length);
+					var rootN = Math.pow(sample.length, 1 / ROOT_TYPE);
 					sample.forEach(function (v) {
-						scaleFromPosition[v] = getScaleFromPosition(v, sqrtN, sample);
+						scaleFromPosition[v] = getScaleFromPosition(v, rootN, sample);
 					});
 				}
 				return x.map(function(x) {
@@ -522,8 +523,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			});
 
 		newBars.append('title');
-		var sqrtN = d3.round(Math.sqrt(xData.length));
-		var percentage = d3.round(100 * sqrtN / xData.length, 2);
+		var rootN = Math.pow(xData.length, 1 / ROOT_TYPE);
+		var percentage = d3.round(100 * rootN / xData.length, 2);
 		bars.select('title')
 			.text(function(d) {
 				if (!isAdaptive) {
@@ -593,19 +594,19 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	
 	function getAdaptiveHistogram(data) {
 		var n = data.length;
-		var sqrtN = Math.round(Math.sqrt(n));
+		var rootN = Math.round(Math.pow(n, 1 / ROOT_TYPE));
 		
 		var points = [];
-		var y = sqrtN / n;
-		for (var i = 0; i < n; i += sqrtN) {
+		var y = rootN / n;
+		for (var i = 0; i < n; i += rootN) {
 			var x = data[i];
-			var x2 = data[Math.min(i + sqrtN, n - 1)];
+			var x2 = data[Math.min(i + rootN, n - 1)];
 			var dx = x2 - x;
 			points.push({
 				x: x,
 				dx: dx,
 				y: y,
-				length: sqrtN
+				length: rootN
 			});
 		}		
 		return points;
