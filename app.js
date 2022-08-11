@@ -422,6 +422,13 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		linesIntegral
 			.transition().duration(TRANSITION_DUR)
 			.attr("d", line);
+
+		svg.append("text")
+			.attr("x", (width / 2))             
+			.attr("y", margin.top * 4)
+			.attr("text-anchor", "middle")  
+			.style("font-size", "16px") 
+			.text(isAdaptive ? "adaptiv" : "nicht-adaptiv");
 	}
 
     function renderDensity(svg, data, xScale, yScale) {
@@ -717,7 +724,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	}
 
 	// find first index, where index + 1 (next) has greater x
-	function findLastIndexThatIsSmaller(startIndex, cdfData, x) {
+	function findClosestIndex(startIndex, cdfData, x) {
 		for (; startIndex < cdfData.length - 1; startIndex++) {
 			var cdfNextPoint = cdfData[startIndex + 1];
 			var cdfNextPointX = cdfNextPoint[0];
@@ -737,7 +744,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			var integralPointX = integralPoint[0];
 			var integralPointY = integralPoint[1];
 			var integralPointDX = integralData[i + 1][0] - integralPointX;
-			j = findLastIndexThatIsSmaller(j, groundTruthIntegral, integralPointX);
+			j = findClosestIndex(j, groundTruthIntegral, integralPointX);
 			
 			var groundTruthPoint = groundTruthIntegral[j];
 			var groundTruthY = groundTruthPoint[1];
