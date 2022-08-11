@@ -230,7 +230,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 
         densityData = getDensityDistribution(xData, DENSQ);
 		cdfData = getCdf(xData, CDFQ, linScale, 1, width/2);
-		integralData = getIntegralData(densityData);
+		densityIntegralData = getIntegralData(densityData);
     }
 
     // from http://bl.ocks.org/mbostock/4349187
@@ -332,7 +332,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
         */
 		cdfCb.change(function () {
 			showCdf=this.checked;
-			renderCdf(svg, cdfData, integralData, x, y2Scale);
+			renderCdf(svg, cdfData, densityIntegralData, x, y2Scale);
 			svg.select('.y2-axis')
 				.transition().duration(TRANSITION_DUR)
 				.style('opacity', (showCdf?1:0));
@@ -556,7 +556,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 
 		renderDensity(svg, densityData, x, y);
 		renderHistogram(svg, histogramData, x, y);
-		renderCdf(svg, cdfData, integralData, x, y2Scale);
+		renderCdf(svg, cdfData, densityIntegralData, x, y2Scale);
 		var groundTruth = groundTruthMixedNormalDistribution;
 		var histogramFunction = getHistogramFunction(histogramData);
 		var densityRMSE = getRMSE(densityData, groundTruth);
@@ -565,19 +565,22 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		var histogramKLDiv = getKLDivergence(histogramFunction, groundTruth);
 		var groundTruthIntegral = getIntegralData(data);
 		var histogramIntegral = getIntegralData(histogramFunction);
-		var cdfIntegralDiff = 
-			getDiffFromGroundTruthIntegral(groundTruthIntegral, integralData);
+		var densityIntegralDiff = 
+			getDiffFromGroundTruthIntegral(groundTruthIntegral, densityIntegralData);
 		var histogramIntegralDiff =
 			getDiffFromGroundTruthIntegral(groundTruthIntegral, histogramIntegral);
+		var cdfIntegralDiff = getDiffFromGroundTruthIntegral(groundTruthIntegral, cdfData);
 
 		csvLog("Density RMSE", d3.round(densityRMSE, 4));
 		csvLog("Density KL Divergenz", d3.round(densityKLDiv, 4));
 		csvLog("Diff between density integral and ground truth", 
-			d3.round(cdfIntegralDiff, 6));
+			d3.round(densityIntegralDiff, 6));
 		csvLog("Histogram RMSE", d3.round(histogramRMSE, 4));
 		csvLog("Histogram KL Divergenz", d3.round(histogramKLDiv, 4));
 		csvLog("Diff between histogram integral and ground truth",
-			d3.round(histogramIntegralDiff, 6))	
+			d3.round(histogramIntegralDiff, 6));
+		csvLog("Diff between CDF and ground truth integral", 
+			d3.round(cdfIntegralDiff, 6));
     }
 
     function getHistogram(data, q, logScaleBase) {
@@ -759,7 +762,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
     var showCdf = SHOWCDF;
     var showDensity = SHOWDENSITY;
 	var densityData = null;
-	var integralData;
+	var densityIntegralData;
 	var cdfData = null;
     var y2Scale = null;
 

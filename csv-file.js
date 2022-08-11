@@ -41,10 +41,15 @@ function logCsvDataObject(csvDataObject) {
             var values = csvDataObject[key];
             var arrow = "";
             if (i >= firstDataIndex && (typeof values[0]) == "number") {
-                if (values[0] < values[1]) {
+                var quotient = values[1] / values[0];
+                if (quotient >= 1.01) {
                     arrow = "↑"
                 } else {
-                    arrow = "↓";
+                    if (quotient <= 0.99) {
+                        arrow = "↓";
+                    } else {
+                        arrow = "=";
+                    }
                     if (typeof improvedCount[i] === 'undefined') {
                         improvedCount[i] = 0;
                     }
