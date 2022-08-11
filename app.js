@@ -427,6 +427,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			.attr("x", (width / 2))             
 			.attr("y", margin.top * 4)
 			.attr("text-anchor", "middle")  
+			.style("font-weight", "bold")
 			.style("font-size", "16px") 
 			.text(isAdaptive ? "adaptiv" : "nicht-adaptiv");
 	}
