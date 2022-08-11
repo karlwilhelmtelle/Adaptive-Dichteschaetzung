@@ -41,7 +41,11 @@
         <script src="sample-mixed-normal-distribution.js"></script>
         <script src="csv-file.js"></script>
         <script>
+            
             var body = $('body');
+            function appendToBody(text) {
+                body.append("<h2><center>" + text + "</center></h2>");                    
+            }
             var csvFileName = 'console-data';
             var csvDelimiter = ';';
             var csvData = [];
@@ -51,11 +55,13 @@
                 var csvHeader = [];
                 var csvDataPart = [];
                 csvLog("adaptiv?", "nicht-adaptiv");
+                appendToBody("nicht-adaptiv");
                 mainCurve(body, data, 0.5, false);
                 csvData.push(csvDataPart);
                 csvHeader = [];
                 csvDataPart = [];
                 csvLog("adaptiv?", "adaptiv");
+                appendToBody("adaptiv");
                 mainCurve(body, data, 0.5, true);
                 csvData.push(csvDataPart);
                 //mainCurve($('body'), GENERALISIERTES_ADDITIVES_MODELL, 0.1);
