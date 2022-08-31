@@ -25,7 +25,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
             bottom: 30,
             left: 50
         },
-        width = 960 - margin.left - margin.right,
+        width = 900 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
 	var svg = d3.select("body").append("svg")
