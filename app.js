@@ -376,7 +376,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			.style({
 				"fill": "none",
 				"stroke": "black",
-				"stroke-opacity": .4,
+				"stroke-opacity": 1,
 				"stroke-width": "2px"
 			});
 		
@@ -385,8 +385,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			.attr("class", "cdf-line")
 			.style({
 				"fill": "none",
-				"stroke": "green",
-				"stroke-opacity": .4,
+				"stroke": "yellow",
+				"stroke-opacity": 1,
 				"stroke-width": "2px"
 			})
 			.on("mouseover", function() {
@@ -401,7 +401,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 					.transition()
 					.style({
 						"stroke-width": "3px",
-						"stroke-opacity": .9
+						"stroke-opacity": 1
 					})
 			})
 			.on("mouseout", function() {
@@ -409,7 +409,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 					.transition()
 					.style({
 						"stroke-width": "2px",
-						"stroke-opacity": .4
+						"stroke-opacity": 1
 					})
 			})
 			.append('title');
