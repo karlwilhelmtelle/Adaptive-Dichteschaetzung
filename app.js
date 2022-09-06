@@ -498,7 +498,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 				"stroke": "brown",
 				"stroke-opacity": .4,
 				"shape-rendering": "crispEdges",
-				"cursor": "crosshair"
+				"cursor": "crosshair",
+				"display": "none"
 			})
 			.attr("x", function(d) { return xScale(d.x); })
 			.attr("width", function(d) { return xScale(d.x + d.dx) - xScale(d.x); })
