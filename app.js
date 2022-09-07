@@ -4,6 +4,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	if (isAdaptive) {
 		DENSQ = 400;
 	}
+	var HIDE_BIN_SLIDER = true;
+	var LOG_BINS = false;
 	var ROOT_POWER = 1/2;
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
@@ -107,6 +109,16 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		}
     }
 
+	function getNumberOfSamplesPerBin(sample) {
+		var result;
+		if (LOG_BINS) {
+			result = sample.length / (1 + 3.3*Math.log(sample.length));
+		} else {
+			result = Math.pow(sample.length, ROOT_POWER);
+		}
+		return result;
+	}
+
 	function createGaussianData() {
 		// loop to populate data array with 
         // probabily - quantile pairs
@@ -193,7 +205,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			return function(sample) {
 				var scaleFromPosition = {};
 				if (isAdaptive) {
-					var rootN = Math.pow(sample.length, ROOT_POWER);
+					var rootN = getNumberOfSamplesPerBin(sample);
 					sample.forEach(function (v) {
 						scaleFromPosition[v] = getScaleFromPosition(v, rootN, sample);
 					});
@@ -288,7 +300,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			densCb.attr('checked', 'checked');
 
 		var binWidthSpan = $('<span>');
-		if (!isAdaptive) {
+		if (!HIDE_BIN_SLIDER && !isAdaptive) {
 			binWidthSpan = $('<span>').append(
 				$('<label>').append('Bin width:').css('margin-right', 5),
 				binStepper/*,
@@ -532,7 +544,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			});
 
 		newBars.append('title');
-		var rootN = Math.pow(xData.length, ROOT_POWER);
+		var rootN = getNumberOfSamplesPerBin(xData);
 		var percentage = d3.round(100 * rootN / xData.length, 2);
 		bars.select('title')
 			.text(function(d) {
@@ -611,7 +623,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	
 	function getAdaptiveHistogram(data) {
 		var n = data.length;
-		var rootN = Math.round(Math.pow(n, ROOT_POWER));
+		var rootN = Math.round(getNumberOfSamplesPerBin(data));
 		
 		var points = [];
 		var y = rootN / n;
