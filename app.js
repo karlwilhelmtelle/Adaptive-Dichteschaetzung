@@ -4,9 +4,11 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	if (isAdaptive) {
 		DENSQ = 400;
 	}
-	var HIDE_BIN_SLIDER = true;
+	
 	var LOG_BINS = false;
-	var ROOT_POWER = 1/2;
+	var ROOT_POWER = 2/3;
+
+	var HIDE_BIN_SLIDER = true;
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
     var SHOWCDF = false; // Default value - show cdf function at startup
