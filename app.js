@@ -1,15 +1,15 @@
 function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
     var HISTOGRAMQ = 0.3; // Default Q
     var DENSQ = 0.55; // Smoothing of the density function, in value units
-	if (isAdaptive) {
-		DENSQ = 400;
-	}
 	
-	var LOG_BINS = false;
-	var ROOT_POWER = 2/3;
+	var LOG_BINS = true;
+	var ROOT_POWER = 1/2;
+	var ROOT_POWER_ADAPTIVE = -1/8;
+	var LOG_POWER = Math.log;
 
 	var HIDE_BINS = true;
 	var HIDE_BIN_SLIDER = true;
+	var HIDE_ADAPTIVE = false;
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
     var SHOWCDF = false; // Default value - show cdf function at startup
@@ -104,9 +104,6 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			csvLog("sigma hat", d3.round(sigmaHat, 2));
 			var recommendedBandwidth = Math.pow(
 				4*Math.pow(sigmaHat, 5)/(3*n), 1/5);
-			if (isAdaptive) {
-				recommendedBandwidth = n / 2 * recommendedBandwidth;
-			}
 			DENSQ = recommendedBandwidth;
 			csvLog("h", d3.round(DENSQ, 2));
 		}
@@ -115,7 +112,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	function getNumberOfSamplesPerBin(sample) {
 		var result;
 		if (LOG_BINS) {
-			result = sample.length / (1 + 3.3*Math.log(sample.length));
+			result = sample.length / (1 + 3.3*LOG_POWER(sample.length));
 		} else {
 			result = Math.pow(sample.length, ROOT_POWER);
 		}
@@ -194,26 +191,31 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			return sum;
 		}
 
-		function getScaleFromPosition(x, radius, sample) {
+		function getScaleFromPosition(x, radius, rootN, sample) {
 			var samplesInArea = getNumberOfSamplesInArea(x, radius, sample);
 			if (samplesInArea == 0) {
 				scale = 200 * q;
 			} else {
-				scale = 2.5 * q / samplesInArea;
+				var denseness = Math.pow(rootN / samplesInArea, ROOT_POWER_ADAPTIVE);
+				scale = q * denseness;
 			}
 			return scale;
 		}
 
-		function kernelDensityEstimator(kernelFunc, x) {
+		function kernelDensityEstimator(kernelFunc, v) {
 			return function(sample) {
 				var scaleFromPosition = {};
 				if (isAdaptive) {
 					var rootN = getNumberOfSamplesPerBin(sample);
+					var xDomain = x.domain();
+					var leftX = xDomain[0];
+					var rightX = xDomain[1];
+					var radius = (rightX - leftX) * rootN / sample.length;
 					sample.forEach(function (v) {
-						scaleFromPosition[v] = getScaleFromPosition(v, rootN, sample);
+						scaleFromPosition[v] = getScaleFromPosition(v, radius, rootN, sample);
 					});
 				}
-				return x.map(function(x) {
+				return v.map(function(x) {
 					var scale = q;
 					return [x, d3.mean(sample, function(v) {
 						if (isAdaptive) {
@@ -438,14 +440,17 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			.transition().duration(TRANSITION_DUR)
 			.attr("d", line);
 
-		svg.append("text")
+		var adaptive_text = svg.append("text")
 			.attr("x", (width / 2))             
 			.attr("y", margin.top * 4)
 			.attr("text-anchor", "middle")  
 			.style("font-weight", "bold")
-			.style("font-size", "16px") 
-			.style("display", "none")
+			.style("font-size", "16px")
 			.text(isAdaptive ? "adaptiv" : "nicht-adaptiv");
+
+		if (HIDE_ADAPTIVE) {
+			adaptive_text.style("display", "none");
+		}
 	}
 
     function renderDensity(svg, data, xScale, yScale) {
@@ -528,7 +533,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
                 });
 
 		if (HIDE_BINS) {
-			newBars.style({ "display": "none" });
+			newBars.style("display", "none");
 		}
 
 
