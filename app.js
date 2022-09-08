@@ -11,11 +11,11 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	var ROOT_POWER = 1/2;
 
 	// Kernel Density Estimator
-	var ROOT_POWER_ADAPTIVE = 1;
+	var ADAPTIVE_EXPONENT = -1/8;
 	var RADIUS_FACTOR = 1;
 
 	// Visualization
-	var HIDE_BINS = false;
+	var HIDE_BINS = true;
 	var HIDE_BIN_SLIDER = true;
 	var HIDE_ADAPTIVE_TEXT = false;
     var TRANSITION_DUR = 750; // ms
@@ -204,7 +204,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			if (samplesInArea == 0) {
 				scale = 200 * q;
 			} else {
-				var denseness = Math.pow(rootN / samplesInArea, ROOT_POWER_ADAPTIVE);
+				var denseness = Math.pow(rootN / samplesInArea, ADAPTIVE_EXPONENT);
 				scale = q * denseness;
 			}
 			return scale;

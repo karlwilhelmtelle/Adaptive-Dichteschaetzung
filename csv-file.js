@@ -82,7 +82,7 @@ function logCsvDataContainer(csvDataContainer1, csvDataContainer2) {
                 }
                 console.log(key, d3.round(100 * (quotient - 1), 1), arrow);
             } else {
-                console.log(key, value1[0], value2[0]);
+                console.log(key, value2[0], value1[0]);
             }
         }
     }
