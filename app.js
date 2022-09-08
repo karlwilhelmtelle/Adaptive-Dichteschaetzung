@@ -8,6 +8,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	var LOG_BINS = false;
 	var ROOT_POWER = 2/3;
 
+	var HIDE_BINS = true;
 	var HIDE_BIN_SLIDER = true;
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
@@ -525,6 +526,10 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 					dHeight /= d.dx;
                     return Math.max(0, dHeight); 
                 });
+
+		if (HIDE_BINS) {
+			newBars.style({ "display": "none" });
+		}
 
 
 		newBars
