@@ -1,15 +1,23 @@
+var DISABLE_EXPORT = true;
+
 function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
+	// Backup (default) Values
     var HISTOGRAMQ = 0.3; // Default Q
     var DENSQ = 0.55; // Smoothing of the density function, in value units
 	
+	// Histogram
 	var LOG_BINS = true;
-	var ROOT_POWER = 1/2;
-	var ROOT_POWER_ADAPTIVE = -1/8;
 	var LOG_POWER = Math.log;
+	var ROOT_POWER = 1/2;
 
-	var HIDE_BINS = true;
+	// Kernel Density Estimator
+	var ROOT_POWER_ADAPTIVE = 1;
+	var RADIUS_FACTOR = 1;
+
+	// Visualization
+	var HIDE_BINS = false;
 	var HIDE_BIN_SLIDER = true;
-	var HIDE_ADAPTIVE = false;
+	var HIDE_ADAPTIVE_TEXT = false;
     var TRANSITION_DUR = 750; // ms
     var CDFQ = HISTOGRAMQ/8;
     var SHOWCDF = false; // Default value - show cdf function at startup
@@ -109,12 +117,12 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 		}
     }
 
-	function getNumberOfSamplesPerBin(sample) {
+	function getNumberOfSamplesPerBin(sampleLength) {
 		var result;
 		if (LOG_BINS) {
-			result = sample.length / (1 + 3.3*LOG_POWER(sample.length));
+			result = sampleLength / (1 + 3.3*LOG_POWER(sampleLength));
 		} else {
-			result = Math.pow(sample.length, ROOT_POWER);
+			result = Math.pow(sampleLength, ROOT_POWER);
 		}
 		return result;
 	}
@@ -206,11 +214,9 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			return function(sample) {
 				var scaleFromPosition = {};
 				if (isAdaptive) {
-					var rootN = getNumberOfSamplesPerBin(sample);
-					var xDomain = x.domain();
-					var leftX = xDomain[0];
-					var rightX = xDomain[1];
-					var radius = (rightX - leftX) * rootN / sample.length;
+					var rootN = getNumberOfSamplesPerBin(sample.length);
+					var rangeDiff = d3.max(xData) - d3.min(xData);
+					var radius = RADIUS_FACTOR * rangeDiff * rootN / sample.length / 2;
 					sample.forEach(function (v) {
 						scaleFromPosition[v] = getScaleFromPosition(v, radius, rootN, sample);
 					});
@@ -448,7 +454,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			.style("font-size", "16px")
 			.text(isAdaptive ? "adaptiv" : "nicht-adaptiv");
 
-		if (HIDE_ADAPTIVE) {
+		if (HIDE_ADAPTIVE_TEXT) {
 			adaptive_text.style("display", "none");
 		}
 	}
@@ -556,7 +562,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			});
 
 		newBars.append('title');
-		var rootN = getNumberOfSamplesPerBin(xData);
+		var rootN = getNumberOfSamplesPerBin(xData.length);
 		var percentage = d3.round(100 * rootN / xData.length, 2);
 		bars.select('title')
 			.text(function(d) {
@@ -635,7 +641,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 	
 	function getAdaptiveHistogram(data) {
 		var n = data.length;
-		var rootN = Math.round(getNumberOfSamplesPerBin(data));
+		var rootN = Math.round(getNumberOfSamplesPerBin(data.length));
 		
 		var points = [];
 		var y = rootN / n;

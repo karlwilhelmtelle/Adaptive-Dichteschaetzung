@@ -41,23 +41,28 @@
         <script src="sample-mixed-normal-distribution.js"></script>
         <script src="csv-file.js"></script>
         <script>
-            
             var body = $('body');
             var csvFileName = 'console-data';
             var csvDelimiter = ';';
             var csvData = [];
-            for (var i = 0; i < SAMPLE_MIXED_NORMAL_DISTRIBUTION.length; i++) {
+            var csvDataAdaptive = {};
+            var csvDataNonAdaptive = {};
+            var numberOfValues = SAMPLE_MIXED_NORMAL_DISTRIBUTION.length;
+            var csvHeader;
+            for (var i = 0; i < numberOfValues; i++) {
                 var csvDataObject = {};
                 var data = SAMPLE_MIXED_NORMAL_DISTRIBUTION[i];
-                var csvHeader = [];
+                csvHeader = [];
                 var csvDataPart = [];
                 csvLog("adaptiv?", "nicht-adaptiv");
                 mainCurve(body, data, 0.5, false);
+                pushCsvDataPart(csvDataNonAdaptive);
                 csvData.push(csvDataPart);
                 csvHeader = [];
                 csvDataPart = [];
                 csvLog("adaptiv?", "adaptiv");
                 mainCurve(body, data, 0.5, true);
+                pushCsvDataPart(csvDataAdaptive);
                 csvData.push(csvDataPart);
                 //mainCurve($('body'), GENERALISIERTES_ADDITIVES_MODELL, 0.1);
                 //mainCurve($('body'));
@@ -65,10 +70,15 @@
 
                 logCsvDataObject(csvDataObject);
             }
-            
+            getMeanOfCsvDataPart(csvDataNonAdaptive);
+            getMeanOfCsvDataPart(csvDataAdaptive);
+            logCsvDataContainer(csvDataNonAdaptive, csvDataAdaptive);
+
             logImprovedCount();
 
-            export_csv(csvHeader, csvData, csvDelimiter, csvFileName);
+            if (!DISABLE_EXPORT) {
+                export_csv(csvHeader, csvData, csvDelimiter, csvFileName);
+            }
         </script>
         
     </body>

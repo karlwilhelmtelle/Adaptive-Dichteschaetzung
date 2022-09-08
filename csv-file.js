@@ -47,16 +47,43 @@ function logCsvDataObject(csvDataObject) {
                 } else {
                     if (quotient <= 0.99) {
                         arrow = "↓";
+                        if (typeof improvedCount[i] === 'undefined') {
+                            improvedCount[i] = 0;
+                        }
+                        improvedCount[i]++;
                     } else {
                         arrow = "=";
                     }
-                    if (typeof improvedCount[i] === 'undefined') {
-                        improvedCount[i] = 0;
-                    }
-                    improvedCount[i]++;
                 }
             }
-            console.log(key, values[0], values[1], arrow);
+            //console.log(key, values[0], values[1], arrow);
+        }
+    }
+    //console.log("\n");
+}
+
+function logCsvDataContainer(csvDataContainer1, csvDataContainer2) {
+    for (var i = 0; i < csvHeader.length; i++) {
+        var key = csvHeader[i];
+        if (key in csvDataContainer1 && key in csvDataContainer2) {
+            var value1 = csvDataContainer1[key];
+            var value2 = csvDataContainer2[key];
+            if (i >= firstDataIndex) {
+                var quotient = value1.mean / value2.mean;
+                // "±" + value.deviation
+                if (quotient >= 1.01) {
+                    arrow = "↑"
+                } else {
+                    if (quotient <= 0.99) {
+                        arrow = "↓";
+                    } else {
+                        arrow = "=";
+                    }
+                }
+                console.log(key, d3.round(100 * (quotient - 1), 1), arrow);
+            } else {
+                console.log(key, value1[0], value2[0]);
+            }
         }
     }
     console.log("\n");
@@ -66,5 +93,29 @@ function logImprovedCount() {
     for (var i = firstDataIndex; i < csvHeader.length; i++) {
         var key = csvHeader[i];
         console.log(key + " improved", improvedCount[i] || 0, "times");
+    }
+}
+
+function pushCsvDataPart(csvDataContainer) {
+    for (var i = 0; i < csvHeader.length; i++) {
+        var key = csvHeader[i];
+        var value = csvDataPart[i];
+        if (i >= firstDataIndex && key in csvDataContainer) {
+            csvDataContainer[key].push(value);
+        } else {
+            csvDataContainer[key] = [value];
+        }
+    }
+}
+
+function getMeanOfCsvDataPart(csvDataContainer) {
+    for (var i = firstDataIndex; i < csvHeader.length; i++) {
+        var key = csvHeader[i];
+        if (key in csvDataContainer) {
+            csvDataContainer[key] = {
+                mean: d3.mean(csvDataContainer[key]),
+                deviation: d3.deviation(csvDataContainer[key])
+            };
+        }
     }
 }
