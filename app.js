@@ -680,6 +680,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			var y = point[1];
 			MSE += Math.pow(y - compareFunc(x), 2);
 		});
+		MSE /= dataPoints.length;
 		return Math.sqrt(MSE);
 	}
 
