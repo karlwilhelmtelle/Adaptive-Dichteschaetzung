@@ -1,20 +1,20 @@
 var DISABLE_EXPORT = false;
 
-function mainCurve($elem, inputData, maxScaleY, isAdaptive, settings) {
+function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 	// Backup (default) Values
     var HISTOGRAMQ = 0.3; // Default Q
     var DENSQ = 0.55; // Smoothing of the density function, in value units
-	
+
 	// Histogram
 	var LOG_HISTOGRAM_DATA = true;
-	var LOG_BINS = true;
-	var LOG_POWER = Math.log;
-	var ROOT_POWER = 2/3;
+	var LOG_BINS = [false, false, false, true, true][iteration];
+	var LOG_POWER = [null, null, null, Math.log10, Math.log][iteration];
+	var ROOT_POWER = [1/3, 1/2, 2/3, null, null][iteration];
 
 	// Kernel Density Estimator
-	var LOG_DENSITY_DATA = false;
-	var ADAPTIVE_EXPONENT = -1/8;
-	var RADIUS_FACTOR = 1;
+	var LOG_DENSITY_DATA = true;
+	var ADAPTIVE_EXPONENT = [1, 1, 1/2, 1/4, -1/8][iteration];
+	var RADIUS_FACTOR = [1, 1/2, 1, 1, 1][iteration];
 
 	// Visualization
 	var HIDE_BINS = true;

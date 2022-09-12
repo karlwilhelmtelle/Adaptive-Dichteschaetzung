@@ -56,10 +56,10 @@ function logCsvDataObject(csvDataObject) {
                     }
                 }
             }
-            console.log(key, values[0], values[1], arrow);
+            //console.log(key, values[0], values[1], arrow);
         }
     }
-    console.log("\n");
+    //console.log("\n");
 }
 
 

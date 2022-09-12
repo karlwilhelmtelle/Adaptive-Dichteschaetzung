@@ -42,42 +42,51 @@
         <script src="csv-file.js"></script>
         <script>
             var body = $('body');
-            var csvFileName = 'console-data';
+            var csvFileNames = [
+                'n^0.33 samples per bin',
+                'n^0.5 samples per bin',
+                'n^0.66 samples per bin',
+                'log10 bins',
+                'log bins'
+            ];
             var csvDelimiter = ';';
-            var csvData = [];
-            var csvDataAdaptive = {};
-            var csvDataNonAdaptive = {};
             var numberOfValues = SAMPLE_MIXED_NORMAL_DISTRIBUTION.length;
             var csvHeader;
-            for (var i = 0; i < numberOfValues; i++) {
-                var csvDataObject = {};
-                var data = SAMPLE_MIXED_NORMAL_DISTRIBUTION[i];
-                csvHeader = [];
-                var csvDataPart = [];
-                csvLog("adaptiv?", "nicht-adaptiv");
-                mainCurve(body, data, 0.5, false);
-                pushCsvDataPart(csvDataNonAdaptive);
-                csvData.push(csvDataPart);
-                csvHeader = [];
-                csvDataPart = [];
-                csvLog("adaptiv?", "adaptiv");
-                mainCurve(body, data, 0.5, true);
-                pushCsvDataPart(csvDataAdaptive);
-                csvData.push(csvDataPart);
-                //mainCurve($('body'), GENERALISIERTES_ADDITIVES_MODELL, 0.1);
-                //mainCurve($('body'));
-                //sampleDistributionGraph($('body'), VALUES);
 
-                logCsvDataObject(csvDataObject);
-            }
-            getMeanOfCsvDataPart(csvDataNonAdaptive);
-            getMeanOfCsvDataPart(csvDataAdaptive);
-            logCsvDataContainer(csvDataNonAdaptive, csvDataAdaptive);
+            for (var j = 0; j < 5; j++) {
+                csvData = [];
+                var csvDataAdaptive = {};
+                var csvDataNonAdaptive = {};
+                for (var i = 0; i < numberOfValues; i++) {
+                    var csvDataObject = {};
+                    var data = SAMPLE_MIXED_NORMAL_DISTRIBUTION[i];
+                    csvHeader = [];
+                    var csvDataPart = [];
+                    csvLog("adaptiv?", "nicht-adaptiv");
+                    mainCurve(body, data, 0.5, false, j);
+                    pushCsvDataPart(csvDataNonAdaptive);
+                    csvData.push(csvDataPart);
+                    csvHeader = [];
+                    csvDataPart = [];
+                    csvLog("adaptiv?", "adaptiv");
+                    mainCurve(body, data, 0.5, true, j);
+                    pushCsvDataPart(csvDataAdaptive);
+                    csvData.push(csvDataPart);
+                    //mainCurve($('body'), GENERALISIERTES_ADDITIVES_MODELL, 0.1);
+                    //mainCurve($('body'));
+                    //sampleDistributionGraph($('body'), VALUES);
 
-            logImprovedCount();
+                    logCsvDataObject(csvDataObject);
+                }
+                getMeanOfCsvDataPart(csvDataNonAdaptive);
+                getMeanOfCsvDataPart(csvDataAdaptive);
+                logCsvDataContainer(csvDataNonAdaptive, csvDataAdaptive);
 
-            if (!DISABLE_EXPORT) {
-                export_csv(csvHeader, csvData, csvDelimiter, csvFileName);
+                logImprovedCount();
+
+                if (!DISABLE_EXPORT) {
+                    export_csv(csvHeader, csvData, csvDelimiter, csvFileNames[j]);
+                }
             }
         </script>
         
