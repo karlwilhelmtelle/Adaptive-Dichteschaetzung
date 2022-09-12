@@ -110,7 +110,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, settings) {
 			xData = inputData;
 			var n = xData.length;
 			csvLog("n", n);
-			var sigmaHat = getSigmaHat(xData);
+			var sigmaHat = d3.deviation(xData);
 			csvLog("sigma hat", d3.round(sigmaHat, 2));
 			var recommendedBandwidth = Math.pow(
 				4*Math.pow(sigmaHat, 5)/(3*n), 1/5);
@@ -739,15 +739,6 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, settings) {
 			}
 		}
 		return sum;
-	}
-
-	function getSigmaHat(sample) {
-		var mean = d3.mean(sample);
-		var sum = d3.sum(sample, function(x) {
-			return Math.pow(x - mean, 2);
-		});
-		var n = sample.length;
-		return Math.sqrt(sum / (n - 1));
 	}
 
 	function getIntegralData(functionData) {
