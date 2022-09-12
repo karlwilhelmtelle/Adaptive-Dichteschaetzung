@@ -56,20 +56,26 @@ function logCsvDataObject(csvDataObject) {
                     }
                 }
             }
-            //console.log(key, values[0], values[1], arrow);
+            console.log(key, values[0], values[1], arrow);
         }
     }
-    //console.log("\n");
+    console.log("\n");
 }
 
+
+
 function logCsvDataContainer(csvDataContainer1, csvDataContainer2) {
+    function getMeanAndDeviation(value) {
+        return d3.round(value.mean, 4) + "±" + d3.round(value.deviation, 4);
+    }
+
     for (var i = 0; i < csvHeader.length; i++) {
         var key = csvHeader[i];
         if (key in csvDataContainer1 && key in csvDataContainer2) {
             var value1 = csvDataContainer1[key];
             var value2 = csvDataContainer2[key];
             if (i >= firstDataIndex) {
-                var quotient = value1.mean / value2.mean;
+                var quotient = value2.mean / value1.mean;
                 // "±" + value.deviation
                 if (quotient >= 1.01) {
                     arrow = "↑"
@@ -80,9 +86,13 @@ function logCsvDataContainer(csvDataContainer1, csvDataContainer2) {
                         arrow = "=";
                     }
                 }
-                console.log(key, d3.round(100 * (quotient - 1), 1), arrow);
+                console.log(key, 
+                    d3.round(100 * (quotient - 1), 1), 
+                    arrow + '\n',
+                    getMeanAndDeviation(value1),
+                    getMeanAndDeviation(value2));
             } else {
-                console.log(key, value2[0], value1[0]);
+                console.log(key, value1[0], value2[0]);
             }
         }
     }
