@@ -1,16 +1,18 @@
-var DISABLE_EXPORT = true;
+var DISABLE_EXPORT = false;
 
-function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
+function mainCurve($elem, inputData, maxScaleY, isAdaptive, settings) {
 	// Backup (default) Values
     var HISTOGRAMQ = 0.3; // Default Q
     var DENSQ = 0.55; // Smoothing of the density function, in value units
 	
 	// Histogram
+	var LOG_HISTOGRAM_DATA = true;
 	var LOG_BINS = true;
 	var LOG_POWER = Math.log;
-	var ROOT_POWER = 1/2;
+	var ROOT_POWER = 2/3;
 
 	// Kernel Density Estimator
+	var LOG_DENSITY_DATA = false;
 	var ADAPTIVE_EXPONENT = -1/8;
 	var RADIUS_FACTOR = 1;
 
@@ -602,16 +604,22 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive) {
 			getDiffFromGroundTruthIntegral(groundTruthIntegral, histogramIntegral);
 		var cdfIntegralDiff = getDiffFromGroundTruthIntegral(groundTruthIntegral, cdfData);
 
-		csvLog("Density RMSE", d3.round(densityRMSE, 4));
-		csvLog("Density KL Divergenz", d3.round(densityKLDiv, 4));
-		csvLog("Diff between density integral and ground truth", 
-			d3.round(densityIntegralDiff, 6));
-		csvLog("Histogram RMSE", d3.round(histogramRMSE, 4));
-		csvLog("Histogram KL Divergenz", d3.round(histogramKLDiv, 4));
-		csvLog("Diff between histogram integral and ground truth",
+		if (LOG_HISTOGRAM_DATA) {
+			csvLog("Histogram RMSE", d3.round(histogramRMSE, 4));
+			csvLog("Histogram KL Divergenz", d3.round(histogramKLDiv, 4));
+			csvLog("Diff between histogram integral and ground truth",
 			d3.round(histogramIntegralDiff, 6));
-		csvLog("Diff between CDF and ground truth integral", 
-			d3.round(cdfIntegralDiff, 6));
+		}
+
+		if (LOG_DENSITY_DATA) {
+			csvLog("Density RMSE", d3.round(densityRMSE, 4));
+			csvLog("Density KL Divergenz", d3.round(densityKLDiv, 4));
+			csvLog("Diff between density integral and ground truth", 
+			d3.round(densityIntegralDiff, 6));
+		}
+		
+		/*csvLog("Diff between CDF and ground truth integral", 
+			d3.round(cdfIntegralDiff, 6));*/
     }
 
     function getHistogram(data, q, logScaleBase) {
