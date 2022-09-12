@@ -1,3 +1,0 @@
-adaptiv?;n;sigma hat;h;actual h;Density RMSE;Histogram RMSE;Density KL Divergenz;Diff between density integral and CDF
-nicht-adaptiv;10000;2.08;0.35;0.35;0.0684;0.1311;0.0014;0.017248
-adaptiv;10000;2.08;0.35;2000;0.0649;0.1969;0.0013;0.017239
