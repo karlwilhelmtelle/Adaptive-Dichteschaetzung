@@ -7,7 +7,7 @@ cat("var SAMPLE_MIXED_NORMAL_DISTRIBUTION = [];")
 
 seeds <- list(123, 1, 12, 1234, 1e6, 2e6, 3e6, 4e6, 2, 3)
 
-nn <- 1e3
+nn <- 1e4
 
 # ========= A mixture of three distributions =========
 
