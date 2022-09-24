@@ -17,7 +17,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 	var RADIUS_FACTOR = [1, 1/2, 1, 1, 1][iteration];
 
 	// Visualization
-	var HIDE_BINS = true;
+	var HIDE_BINS = false;
 	var HIDE_BIN_SLIDER = true;
 	var HIDE_ADAPTIVE_TEXT = false;
     var TRANSITION_DUR = 750; // ms
