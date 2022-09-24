@@ -151,13 +151,13 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
         });
 	}
 
-    function getCdf(data, q, xScale, logScaleBase, maxPoints) {
+    function getCdf(xData, q, xScale, logScaleBase, maxPoints) {
 		var xDomain = xScale.domain();
 		var leftX = xDomain[0];
 		var rightX = xDomain[1];
 		var maxQ = Math.max(q, (rightX - leftX)/maxPoints);
 
-		var binnedData = getHistogram(data, maxQ, logScaleBase);
+		var binnedData = getHistogram(xData, maxQ, logScaleBase);
 
 		if (binnedData.length==0)
 			return [];
@@ -179,7 +179,14 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 		cdfData.splice(0, 0, [leftX, 0]);
 		cdfData.push([rightX, 1]);
 
-		return cdfData;
+		// return only at ticks
+		var index = 0;
+		return data.map(function (point) {
+			var x = point[0];
+			index = findClosestIndex(index, cdfData, x);
+			var y = cdfData[index][1];
+			return [x, y];
+		});
 	}
 
     function getDensityDistribution(data, q) {
