@@ -603,13 +603,12 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 		var histogramRMSE = getRMSE(histogramFunction, groundTruth);
 		var densityKLDiv = getKLDivergence(densityData, groundTruth);
 		var histogramKLDiv = getKLDivergence(histogramFunction, groundTruth);
-		var groundTruthIntegral = getIntegralData(data);
-		var histogramIntegral = getIntegralData(histogramFunction);
-		var densityIntegralDiff = 
-			getDiffFromGroundTruthIntegral(groundTruthIntegral, densityIntegralData);
-		var histogramIntegralDiff =
-			getDiffFromGroundTruthIntegral(groundTruthIntegral, histogramIntegral);
-		var cdfIntegralDiff = getDiffFromGroundTruthIntegral(groundTruthIntegral, cdfData);
+		var histogramDiff = getDiffFromGroundTruth(histogramFunction);
+		var densityDiff = getDiffFromGroundTruth(densityData);
+		var densityIntegralDiff = getIntegralValueFromTicks(densityDiff);
+		var histogramIntegralDiff = getIntegralValueFromTicks(histogramDiff);
+		//var cdfDiff = getDiffFromGroundTruth(cdfData);
+		//var cdfIntegralDiff = getIntegralValueFromTicks(cdfDiff);
 
 		if (LOG_HISTOGRAM_DATA) {
 			csvLog("Histogram RMSE", d3.round(histogramRMSE, 4));
@@ -625,8 +624,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 			d3.round(densityIntegralDiff, 6));
 		}
 		
-		csvLog("Diff between CDF and ground truth integral", 
-			d3.round(cdfIntegralDiff, 6));
+		//csvLog("Diff between CDF and ground truth integral", 
+		//	d3.round(cdfIntegralDiff, 6));
     }
 
     function getHistogram(data, q, logScaleBase) {
@@ -777,22 +776,22 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 		return startIndex;
 	}
 
-	function getDiffFromGroundTruthIntegral(groundTruthIntegral, integralData) {
-		var diff = 0;
-		var j = 0;
-
-		for (var i = 1; i < integralData.length - 1; i++) {
-			var integralPoint = integralData[i];
-			var integralPointX = integralPoint[0];
-			var integralPointY = integralPoint[1];
-			var integralPointDX = integralData[i + 1][0] - integralPointX;
-			j = findClosestIndex(j, groundTruthIntegral, integralPointX);
-			
-			var groundTruthPoint = groundTruthIntegral[j];
-			var groundTruthY = groundTruthPoint[1];
-			diff += (groundTruthY - integralPointY) * integralPointDX;
+	function getDiffFromGroundTruth(dataPoints) {
+		var result = [];
+		for (var i = 0; i < dataPoints.length; i++) {
+			var groundTruth = data[i];
+			var estimate = dataPoints[i];
+			var x = estimate[0];
+			var y = estimate[1] - groundTruth[1];
+			result.push([x, y]);
 		}
-		return Math.abs(diff);
+		return result;
+	}
+
+	function getIntegralValueFromTicks(diffFunction) {
+		var dx = diffFunction[1][0] - diffFunction[0][0];
+		var sum = d3.sum(diffFunction, el => el[1]);
+		return Math.abs(sum / dx);
 	}
 
     var histQ=HISTOGRAMQ;
