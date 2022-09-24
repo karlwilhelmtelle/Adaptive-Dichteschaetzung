@@ -249,7 +249,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 		return densityData;
 	}
 
-    function initStatic(svg) {
+    function initStatic() {
         var linScale = x;
         y2Scale = getY2Scale();
 
