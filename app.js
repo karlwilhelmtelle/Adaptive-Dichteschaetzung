@@ -7,9 +7,9 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 
 	// Histogram
 	var LOG_HISTOGRAM_DATA = true;
-	var LOG_BINS = false //[false, false, false, true, true][iteration];
-	var LOG_POWER = null //[null, null, null, Math.log10, Math.log][iteration];
-	var ROOT_POWER = 1/2 //[1/3, 1/2, 2/3, null, null][iteration];
+	var LOG_BINS = [false, false, false, true, true][iteration];
+	var LOG_POWER = [null, null, null, Math.log10, Math.log][iteration];
+	var ROOT_POWER = [1/3, 1/2, 2/3, null, null][iteration];
 
 	// Kernel Density Estimator
 	var LOG_DENSITY_DATA = true;
