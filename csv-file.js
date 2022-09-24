@@ -104,6 +104,7 @@ function logImprovedCount() {
         var key = csvHeader[i];
         console.log(key + " improved", improvedCount[i] || 0, "times");
     }
+    console.log("\n\n");
 }
 
 function pushCsvDataPart(csvDataContainer) {
