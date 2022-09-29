@@ -581,7 +581,7 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 				var barHeight = d.y / d.dx;
 				return d3.round(d.x,2) + ' bis ' + d3.round(d.x+d.dx, 2) + ": " + 
 				percentage + "% (" + d.length + " Samples)\n" + 
-				"Hoehe: " + d3.round(barHeight, 2) + "\n" +
+				"Hoehe: " + d3.round(barHeight, 3) + "\n" +
 				"Flaeche: " + d3.round(d.dx * barHeight, 4);
 			});
 	}
