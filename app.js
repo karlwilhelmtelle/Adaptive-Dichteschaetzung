@@ -790,8 +790,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 
 	function getIntegralValueFromTicks(diffFunction) {
 		var dx = diffFunction[1][0] - diffFunction[0][0];
-		var sum = d3.sum(diffFunction, el => el[1]);
-		return Math.abs(sum * dx);
+		var sum = d3.sum(diffFunction, el => Math.abs(el[1]));
+		return sum * dx;
 	}
 
     var histQ=HISTOGRAMQ;
