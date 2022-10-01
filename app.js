@@ -603,8 +603,8 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 		var histogramRMSE = getRMSE(histogramFunction, groundTruth);
 		var densityKLDiv = getKLDivergence(densityData, groundTruth);
 		var histogramKLDiv = getKLDivergence(histogramFunction, groundTruth);
-		var histogramDiff = getDiffFromGroundTruth(histogramFunction);
-		var densityDiff = getDiffFromGroundTruth(densityData);
+		var histogramDiff = getAbsoluteDiffFromGroundTruth(histogramFunction);
+		var densityDiff = getAbsoluteDiffFromGroundTruth(densityData);
 		var densityIntegralDiff = getIntegralValueFromTicks(densityDiff);
 		var histogramIntegralDiff = getIntegralValueFromTicks(histogramDiff);
 		//var cdfDiff = getDiffFromGroundTruth(cdfData);
@@ -776,21 +776,21 @@ function mainCurve($elem, inputData, maxScaleY, isAdaptive, iteration) {
 		return startIndex;
 	}
 
-	function getDiffFromGroundTruth(dataPoints) {
+	function getAbsoluteDiffFromGroundTruth(dataPoints) {
 		var result = [];
 		for (var i = 0; i < dataPoints.length; i++) {
 			var groundTruth = data[i];
 			var estimate = dataPoints[i];
 			var x = estimate[0];
 			var y = estimate[1] - groundTruth[1];
-			result.push([x, y]);
+			result.push([x, Math.abs(y)]);
 		}
 		return result;
 	}
 
 	function getIntegralValueFromTicks(diffFunction) {
 		var dx = diffFunction[1][0] - diffFunction[0][0];
-		var sum = d3.sum(diffFunction, el => Math.abs(el[1]));
+		var sum = d3.sum(diffFunction, el => el[1]);
 		return sum * dx;
 	}
 
